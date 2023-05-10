@@ -21,4 +21,10 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get employee by id")
+    public ResponseEntity<Employee> getEmployeeById(long id){
+        return ResponseEntity.ok(employeeService.getEmployeeById(id));
+    }
+
 }
