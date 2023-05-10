@@ -2,7 +2,6 @@ package ztw.bookmylook.availabilty;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,7 +16,7 @@ import java.time.LocalTime;
 public class Availability {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;

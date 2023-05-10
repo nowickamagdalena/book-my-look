@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface AvailabilityRepository extends JpaRepository<Availability, Long> {
     List<Availability> findAllByEmployeeIdAndDateBetween(long employeeId, LocalDate startDate, LocalDate endDate);
+
+    List<Availability> findAllByEmployeeIdAndDate(long employeeId, LocalDate date);
 }

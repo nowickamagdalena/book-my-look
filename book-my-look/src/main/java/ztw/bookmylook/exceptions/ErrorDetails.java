@@ -1,5 +1,7 @@
 package ztw.bookmylook.exceptions;
 
 
-public record ErrorDetails(java.time.LocalDateTime timestamp, String message, String details) {
+import java.time.LocalDateTime;
+
+public record ErrorDetails(LocalDateTime timestamp, String message, String details) {
 }

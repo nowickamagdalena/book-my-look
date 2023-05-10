@@ -18,7 +18,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
-    private ErrorDetails getErrorDetails(NoSuchElementException e, WebRequest request) {
+    @ExceptionHandler(AvailabilityConflictException.class)
+    public ResponseEntity<ErrorDetails> handleAvailabilityConflictException(AvailabilityConflictException e,
+                                                                            WebRequest request) {
+        ErrorDetails errorDetails = getErrorDetails(e, request);
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorDetails> handleIllegalArgumentException(IllegalArgumentException e, WebRequest request) {
+        ErrorDetails errorDetails = getErrorDetails(e, request);
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    private ErrorDetails getErrorDetails(Exception e, WebRequest request) {
         return new ErrorDetails(LocalDateTime.now(), e.getMessage(), request.getDescription(false));
     }
 }
