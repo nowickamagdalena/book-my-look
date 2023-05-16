@@ -21,11 +21,10 @@ public class AvailabilityController {
     @GetMapping("/employees/{employeeId}/availabilities")
     @Operation(summary = "Get availabilities for employee", description = "Get availabilities for employee within " +
             "specified dates")
-    public ResponseEntity<List<Availability>> getEmployeesAvailabilitiesForDates(@PathVariable long employeeId,
-                                                                                 @RequestParam @DateTimeFormat(iso =
-                                                                                         DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                                                                 @RequestParam @DateTimeFormat(iso =
-                                                                                         DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    public ResponseEntity<List<Availability>> getEmployeesAvailabilitiesForDates(
+            @PathVariable long employeeId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return ResponseEntity.ok(availabilityService.getEmployeesAvailabilitiesForDates(employeeId, startDate,
                 endDate));
     }
