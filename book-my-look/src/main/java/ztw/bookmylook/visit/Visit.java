@@ -13,7 +13,6 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Getter
 public class Visit {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,5 +29,9 @@ public class Visit {
 
     public int getDuration() {
         return salonService.getDuration();
+    }
+
+    public LocalTime getEndTime() {
+        return startTime.plusMinutes(salonService.getDuration());
     }
 }

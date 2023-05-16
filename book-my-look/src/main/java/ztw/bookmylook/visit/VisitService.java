@@ -6,6 +6,7 @@ import ztw.bookmylook.availabilty.AvailabilityService;
 import ztw.bookmylook.employee.EmployeeService;
 import ztw.bookmylook.salonservice.SalonService;
 import ztw.bookmylook.salonservice.SalonServiceRepository;
+import ztw.bookmylook.visit.dto.VisitDto;
 import ztw.bookmylook.visit.dto.VisitSlotDto;
 
 import java.time.LocalDate;
@@ -15,6 +16,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+
+import static ztw.bookmylook.utils.DateUtils.validateDateRange;
 
 @Service
 public class VisitService {
@@ -32,14 +35,26 @@ public class VisitService {
         this.employeeService = employeeService;
     }
 
+    public List<VisitDto> getVisitsForEmployee(long employeeId, LocalDate startDate, LocalDate endDate) {
+        employeeService.checkIfEmployeeExists(employeeId);
+        validateDateRange(startDate, endDate);
+
+        return visitRepository.findAllByEmployeeIdAndDateBetween(employeeId, startDate, endDate).stream()
+                .map(v -> new VisitDto(
+                        v.getDate(), v.getStartTime(), v.getEndTime(), v.getSalonService().getName(), v.getClient())
+                )
+                .toList();
+    }
+
     public List<VisitSlotDto> getEmployeesSlotsForSalonService(long employeeId, long salonServiceId,
                                                                LocalDate startDate, LocalDate endDate) {
+        validateDateRange(startDate, endDate);
         employeeService.checkIfEmployeeExists(employeeId);
         int duration = getSalonServiceDuration(salonServiceId);
         return availabilityService.getEmployeesAvailabilitiesForDates(employeeId, startDate, endDate).stream()
                 .collect(Collectors.groupingBy(Availability::getDate)).entrySet().stream()
                 .map(day -> {
-                            day.getValue().sort(Comparator.comparing(Availability::getStartTime));
+                    day.getValue().sort(Comparator.comparing(Availability::getStartTime));
                             List<Visit> bookedVisits = visitRepository.findAllByEmployeeIdAndDate(employeeId,
                                     day.getKey());
                             return getPossibleSlotsForDate(day.getValue(), duration, bookedVisits);

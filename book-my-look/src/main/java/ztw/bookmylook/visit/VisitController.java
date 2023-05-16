@@ -4,8 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ztw.bookmylook.visit.dto.VisitDto;
 import ztw.bookmylook.visit.dto.VisitSlotDto;
 
 import java.time.LocalDate;
@@ -17,6 +19,16 @@ public class VisitController {
 
     public VisitController(VisitService visitService) {
         this.visitService = visitService;
+    }
+
+    @GetMapping("/visits/employee/{employeeId}")
+    @Operation(summary = "Get visits for employee", description = "Get visits for employee within specified dates")
+    public ResponseEntity<List<VisitDto>> getVisitsForEmployee(
+            @PathVariable long employeeId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return ResponseEntity.ok(visitService.getVisitsForEmployee(employeeId, startDate, endDate));
     }
 
     @GetMapping("/visits/slots")
