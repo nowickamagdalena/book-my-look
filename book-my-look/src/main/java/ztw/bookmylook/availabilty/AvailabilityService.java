@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static ztw.bookmylook.utils.DateUtils.validateDateRange;
+
 @Service
 public class AvailabilityService {
     private final AvailabilityRepository availabilityRepository;
@@ -25,6 +27,7 @@ public class AvailabilityService {
 
     public List<Availability> getEmployeesAvailabilitiesForDates(long employeeId, LocalDate startDate,
                                                                  LocalDate endDate) {
+        validateDateRange(startDate, endDate);
         employeeService.checkIfEmployeeExists(employeeId);
         return availabilityRepository.findAllByEmployeeIdAndDateBetween(employeeId, startDate, endDate);
     }
