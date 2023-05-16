@@ -63,6 +63,9 @@ public class AvailabilityService {
         if (!availability.getStartTime().isBefore(availability.getEndTime())) {
             throw new IllegalArgumentException("Start time cannot be equal to or after end time");
         }
+        if (availability.getStartTime().getMinute() % 15 != 0 || availability.getEndTime().getMinute() % 15 != 0) {
+            throw new IllegalArgumentException("Start and end time must be divisible by 15 minutes");
+        }
         availabilityRepository.findAllByEmployeeIdAndDate(availability.getEmployeeId(), availability.getDate()).forEach(
                 a -> {
                     if (hasConflictWithOtherAvailability(availability, a)) {

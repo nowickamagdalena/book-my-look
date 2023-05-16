@@ -1,5 +1,6 @@
 package ztw.bookmylook.salonservice;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.Id;
 
 @Entity
 @NoArgsConstructor
+@Getter
 public class SalonService {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +26,5 @@ public class SalonService {
         this.price = price;
         this.description = description;
     }
+
 }
