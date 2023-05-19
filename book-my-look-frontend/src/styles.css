@@ -1,0 +1,14 @@
+body {
+    margin: 0;
+    padding-top: 60px;
+}
+
+.content {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.navbar-color {
+    background-color: #c771b9;
+}

@@ -3,13 +3,12 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUserLock} from "@fortawesome/free-solid-svg-icons";
-import "../styles/navigationBar.css";
 
 const NavigationBar = () => {
     return (
-        <Navbar collapseOnSelect expand="lg" fixed="top" className="navbar-color">
+        <Navbar collapseOnSelect expand="lg" fixed="top" variant="dark" className="navbar-color">
             <Container fluid>
-                <Navbar.Brand style={{ color: 'white' }}>BookMyLook</Navbar.Brand>
+                <Navbar.Brand>BookMyLook</Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto">
