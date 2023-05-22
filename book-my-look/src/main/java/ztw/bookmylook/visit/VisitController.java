@@ -50,4 +50,22 @@ public class VisitController {
     ) {
         return new ResponseEntity<>(visitService.addVisit(visit), HttpStatus.CREATED);
     }
+
+    @PutMapping("/visits/{visitId}")
+    @Operation(summary = "Update visit", description = "Update visit")
+    public ResponseEntity<Visit> updateVisit(
+            @PathVariable long visitId,
+            @RequestBody VisitPostDto visit
+    ) {
+        return ResponseEntity.ok(visitService.updateVisit(visitId, visit));
+    }
+
+    @DeleteMapping("/visits/{visitId}")
+    @Operation(summary = "Delete visit", description = "Delete visit")
+    public ResponseEntity<Void> deleteVisit(
+            @PathVariable long visitId
+    ) {
+        visitService.deleteVisit(visitId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

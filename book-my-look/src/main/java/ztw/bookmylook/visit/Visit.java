@@ -2,6 +2,7 @@ package ztw.bookmylook.visit;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ztw.bookmylook.client.Client;
 import ztw.bookmylook.employee.Employee;
 import ztw.bookmylook.salonservice.SalonService;
@@ -13,6 +14,7 @@ import java.time.LocalTime;
 @Entity
 @NoArgsConstructor
 @Getter
+@Setter
 public class Visit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

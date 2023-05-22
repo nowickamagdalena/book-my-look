@@ -23,4 +23,14 @@ public class ClientService {
         Client newClient = modelMapper.map(client, Client.class);
         return clientRepository.save(newClient);
     }
+
+    public Client updateClient(long id, ClientDto clientDto) {
+        var client = getClientById(id);
+        modelMapper.map(clientDto, client);
+        return clientRepository.save(client);
+    }
+
+    public ClientDto mapClientToDto(Client client) {
+        return modelMapper.map(client, ClientDto.class);
+    }
 }

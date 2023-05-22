@@ -49,7 +49,8 @@ public class VisitService {
 
         return visitRepository.findAllByEmployeeIdAndDateBetween(employeeId, startDate, endDate).stream()
                 .map(v -> new VisitDto(
-                        v.getDate(), v.getStartTime(), v.getEndTime(), v.getSalonService().getName(), v.getClient())
+                        v.getId(), v.getDate(), v.getStartTime(), v.getEndTime(), v.getSalonService().getName(),
+                        clientService.mapClientToDto(v.getClient()))
                 )
                 .toList();
     }
@@ -115,8 +116,27 @@ public class VisitService {
     }
 
 
+    public Visit updateVisit(long visitId, VisitPostDto visit) {
+        Visit visitToUpdate = visitRepository.findById(visitId).orElseThrow(
+                () -> new NoSuchElementException("Visit with id " + visitId + " does not exist")
+        );
+        Employee employee = employeeService.getEmployeeById(visit.getEmployeeId());
+        SalonService salonService = salonServiceRepository.findById(visit.getSalonServiceId()).orElseThrow(
+                () -> new NoSuchElementException("Salon service with id " + visit.getSalonServiceId() + " does not exist")
+        );
 
+        visitToUpdate.setDate(visit.getDate());
+        visitToUpdate.setStartTime(visit.getStartTime());
+        visitToUpdate.setSalonService(salonService);
+        visitToUpdate.setEmployee(employee);
 
+        Client client = visitToUpdate.getClient();
+        clientService.updateClient(client.getId(), visit.getClient());
 
+        return visitRepository.save(visitToUpdate);
+    }
 
+    public void deleteVisit(long visitId) {
+        visitRepository.deleteById(visitId);
+    }
 }
