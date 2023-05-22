@@ -28,4 +28,12 @@ public class EmployeeService {
             throw  new NoSuchElementException("Employee with id " + id + " does not exist");
         }
     }
+
+    public boolean checkIfEmployeeHasSalonService(long employeeId, long salonServiceId) {
+        return employeeRepository.existsByIdAndAvailableServicesId(employeeId, salonServiceId);
+    }
+
+    public List<Employee> getEmployeesByServiceId(long serviceId) {
+        return employeeRepository.findByAvailableServicesId(serviceId);
+    }
 }
