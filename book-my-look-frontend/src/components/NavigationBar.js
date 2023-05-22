@@ -16,6 +16,7 @@ const NavigationBar = () => {
                         <Nav.Link href="/out-team" style={{ color: 'white' }}>Our team</Nav.Link>
                         <Nav.Link href="/book-visit" style={{ color: 'white' }}>Book visit</Nav.Link>
                         <Nav.Link href="/contact" style={{ color: 'white' }}>Contact</Nav.Link>
+                        <Nav.Link href="/availability/1" style={{ color: 'white' }}>Availability</Nav.Link>
                     </Nav>
                     <Nav>
                         <Nav.Link href="/employee-login" style={{ color: 'white' }}>

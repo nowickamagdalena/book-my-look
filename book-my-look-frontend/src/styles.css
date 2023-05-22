@@ -1,12 +1,24 @@
+html, body, #app, #app>div {
+    height: 100%
+  }
+  body > #root > div {
+    height: 100%;
+  }
 body {
     margin: 0;
     padding-top: 60px;
+    height: 100%;
 }
 
 .content {
     padding: 20px;
     display: flex;
     justify-content: center;
+    height: calc(100% - (20px * 2)) ;
+}
+
+.book-visit {
+    width: 80%;
 }
 
 .navbar-color {
