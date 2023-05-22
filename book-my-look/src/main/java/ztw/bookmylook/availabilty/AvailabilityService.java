@@ -90,8 +90,8 @@ public class AvailabilityService {
 
     private boolean hasConflictWithOtherAvailability(Availability availability, Availability other) {
         return (availability.getId() == null || !availability.getId().equals(other.getId()))
-                && !(!other.getEndTime().isAfter(availability.getStartTime())
-                || !other.getStartTime().isBefore(availability.getEndTime()));
+                && !(other.getEndTime().isBefore(availability.getStartTime())
+                || other.getStartTime().isAfter(availability.getEndTime()));
     }
 
     private Availability getAvailabilityById(long id) throws NoSuchElementException {
@@ -99,4 +99,5 @@ public class AvailabilityService {
                 () -> new NoSuchElementException("Availability with id " + id + " does not exist")
         );
     }
+
 }
