@@ -2,7 +2,7 @@ package ztw.bookmylook.visit.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import ztw.bookmylook.visit.Client;
+import ztw.bookmylook.client.Client;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

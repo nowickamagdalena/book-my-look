@@ -3,10 +3,14 @@ package ztw.bookmylook.visit;
 import org.springframework.stereotype.Service;
 import ztw.bookmylook.availabilty.Availability;
 import ztw.bookmylook.availabilty.AvailabilityService;
+import ztw.bookmylook.client.Client;
+import ztw.bookmylook.client.ClientService;
+import ztw.bookmylook.employee.Employee;
 import ztw.bookmylook.employee.EmployeeService;
 import ztw.bookmylook.salonservice.SalonService;
 import ztw.bookmylook.salonservice.SalonServiceRepository;
 import ztw.bookmylook.visit.dto.VisitDto;
+import ztw.bookmylook.visit.dto.VisitPostDto;
 import ztw.bookmylook.visit.dto.VisitSlotDto;
 
 import java.time.LocalDate;
@@ -27,12 +31,16 @@ public class VisitService {
     private final AvailabilityService availabilityService;
     private final EmployeeService employeeService;
 
+    private final ClientService clientService;
+
     public VisitService(VisitRepository visitRepository, AvailabilityService availabilityService,
-                        SalonServiceRepository salonServiceRepository, EmployeeService employeeService) {
+                        SalonServiceRepository salonServiceRepository, EmployeeService employeeService,
+                        ClientService clientService) {
         this.visitRepository = visitRepository;
         this.availabilityService = availabilityService;
         this.salonServiceRepository = salonServiceRepository;
         this.employeeService = employeeService;
+        this.clientService = clientService;
     }
 
     public List<VisitDto> getVisitsForEmployee(long employeeId, LocalDate startDate, LocalDate endDate) {
@@ -94,4 +102,21 @@ public class VisitService {
                 || !v.getStartTime().plusMinutes(v.getDuration()).isAfter(currentStartTime)
         );
     }
+
+    public Visit addVisit(VisitPostDto visit) {
+        Employee employee = employeeService.getEmployeeById(visit.getEmployeeId());
+        SalonService salonService = salonServiceRepository.findById(visit.getSalonServiceId()).orElseThrow(
+                () -> new NoSuchElementException("Salon service with id " + visit.getSalonServiceId() + " does not exist")
+        );
+
+        Client client = clientService.addClient(visit.getClient());
+        Visit newVisit = new Visit(visit.getDate(), visit.getStartTime(), salonService, employee, client);
+        return visitRepository.save(newVisit);
+    }
+
+
+
+
+
+
 }
