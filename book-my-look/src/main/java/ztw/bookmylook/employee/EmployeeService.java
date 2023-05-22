@@ -32,4 +32,8 @@ public class EmployeeService {
     public boolean checkIfEmployeeHasSalonService(long employeeId, long salonServiceId) {
         return employeeRepository.existsByIdAndAvailableServicesId(employeeId, salonServiceId);
     }
+
+    public List<Employee> getEmployeesByServiceId(long serviceId) {
+        return employeeRepository.findByAvailableServicesId(serviceId);
+    }
 }
