@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
+import axios from 'axios';
 import { useParams } from "react-router-dom";
 import { startOfWeek, endOfWeek } from 'date-fns'
 import FullCalendar from '@fullcalendar/react'
-// import { Calendar } from '@fullcalendar/core'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
+import Alert from "react-bootstrap/Alert";
 
-// const event = { title: 'Manicure', start: "2023-05-23T12:00:00", end: "2023-05-23T14:00:00" };
 
 const EmployeeAvailability = () => {
     const params = useParams();
@@ -18,55 +18,67 @@ const EmployeeAvailability = () => {
     const end = endOfWeek(date, { weekStartsOn: 1 }).toISOString().split('T')[0];
 
     const [events, setEvents] = useState([]);
-    useEffect(() => {
 
-        fetch(`http://localhost:8080/employees/${userId}/availabilities?startDate=${start}&endDate=${end}`)
+    useEffect(() => {
+        axios.get(`http://localhost:8080/employees/${userId}/availabilities?startDate=${start}&endDate=${end}`)
             .then(res => {
-                return res.json();
-            })
-            .then(data => {
-                const newEvents = data.map(aval => {
+                const newEvents = res.data.map(aval => {
                     return { title: "Available", start: `${aval.date}T${aval.startTime}`, end: `${aval.date}T${aval.endTime}` };
                 });
-                setEvents(newEvents)
-                // console.log("Events", events);
-            });
-    }, [])
-    const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+                setEvents(newEvents);
+            })
+    }, []);
 
+    const [show, setShow] = useState(false);
+    const handleClose = () => {
+        setShowMessage(false);
+        setFormStartTime("");
+        setFormEndTime("");
+        setShow(false);
+    }
+    const handleShow = () => setShow(true);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [showMessage, setShowMessage] = useState(false);
 
     const [formStartTime, setFormStartTime] = useState('');
     const [formEndTime, setFormEndTime] = useState('');
     const [validated, setValidated] = useState(false);
+
     const handleSave = (event) => {
         const form = event.currentTarget;
         const startT = formStartTime.split(':').map(s => parseInt(s));
         const endT = formEndTime.split(':').map(s => parseInt(s));
-        if (form.checkValidity() === false || (startT[0] > endT[0]) || (startT[0] === endT[0] && startT[1] >= endT[1])) {
+        const isTimePeriodInvalid = (startT[0] > endT[0]) || (startT[0] === endT[0] && startT[1] >= endT[1]);
+        if (form.checkValidity() === false || isTimePeriodInvalid) {
             //TODO: Display this message to user, Also validate only 15 minutes can be chosen maybe change for time picker
-            console.log("Display this message to user");
-            console.log("Also validate only 15 minutes can be chosen maybe change for time picker");
+            if (isTimePeriodInvalid) {
+                setErrorMessage("Start time needs to be after end time");
+                setShowMessage(true);
+            }
             event.preventDefault();
             event.stopPropagation();
+        } else {
+            event.preventDefault();
+
+            var event = { date: event.target.date.value, startTime: event.target.startTime.value, endTime: event.target.endTime.value };
+
+            axios.post(`http://localhost:8080/employees/${userId}/availabilities`, event)
+                .then(response => {
+                    console.log(response);
+                    window.location.reload();
+                })
+                .catch(error => {
+                    if (error.response) {
+                        setErrorMessage(error.response.data.message);
+                    } else {
+                        setErrorMessage(error.message);
+                    }
+                    setShowMessage(true);
+                    console.error('There was an error!');
+                });
+
         }
-
         setValidated(true);
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ date: event.target.date.value, startTime: event.target.startTime.value, endTime: event.target.endTime.value })
-        };
-        fetch(`http://localhost:8080/employees/${userId}/availabilities`, requestOptions)
-            .then((res) => res.json())
-            .then((post) => console.log(post))
-            .catch((err) => {
-                //TODO: add error handling message for user
-                console.log(err.message);
-            });
-        // console.log(userId, event.target.date.value, event.target.startTime.value, event.target.endTime.value);
-
     };
 
     return (
@@ -85,9 +97,12 @@ const EmployeeAvailability = () => {
                 centered
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>New availability</Modal.Title>
+                    <Modal.Title>Add new availability</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <Alert show={showMessage} variant="danger">
+                        Something went wrong! {errorMessage}
+                    </Alert>
                     <Form noValidate validated={validated} onSubmit={handleSave}>
                         <Form.Group className="mb-3" controlId="modalDayControl">
                             <Form.Label>Enter day</Form.Label>
@@ -138,6 +153,7 @@ const EmployeeAvailability = () => {
                 displayEventEnd={true}
                 eventBackgroundColor="#c771b9"
                 eventContent={renderEventContent}
+                eventClick={handleEventClick}
             />
         </div>
     );
@@ -150,6 +166,11 @@ function renderEventContent(eventInfo) {
             <i>{eventInfo.event.title}</i>
         </>
     )
+}
+
+function handleEventClick(eventInfo) {
+    //TODO: handle event clicking
+    console.log("Event has been clicked");
 }
 
 export default EmployeeAvailability;
