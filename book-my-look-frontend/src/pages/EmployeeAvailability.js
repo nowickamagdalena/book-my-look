@@ -19,27 +19,41 @@ const EmployeeAvailability = () => {
 
     const [events, setEvents] = useState([]);
 
-    useEffect(() => {
+    const updateEvents = () => {
         axios.get(`http://localhost:8080/employees/${userId}/availabilities?startDate=${start}&endDate=${end}`)
             .then(res => {
                 const newEvents = res.data.map(aval => {
-                    return { title: "Available", start: `${aval.date}T${aval.startTime}`, end: `${aval.date}T${aval.endTime}` };
+                    return { title: "Available", start: `${aval.date}T${aval.startTime}`, end: `${aval.date}T${aval.endTime}`, availibilityId: aval.id };
                 });
                 setEvents(newEvents);
-            })
+            }).catch(error => {
+                console.error('There was an error!');
+            });
+    }
+
+    useEffect(() => {
+        updateEvents();
     }, []);
 
+
     const [show, setShow] = useState(false);
+    const handleShow = () => setShow(true);
     const handleClose = () => {
         setShowMessage(false);
+        setCurrentAvalId("");
+        setFormDate("");
         setFormStartTime("");
         setFormEndTime("");
+        setValidated(false);
+        setShowDelete(false);
         setShow(false);
     }
-    const handleShow = () => setShow(true);
     const [errorMessage, setErrorMessage] = useState("");
     const [showMessage, setShowMessage] = useState(false);
+    const [showDelete, setShowDelete] = useState(false);
 
+    const [currentAvalId, setCurrentAvalId] = useState('');
+    const [formDate, setFormDate] = useState('');
     const [formStartTime, setFormStartTime] = useState('');
     const [formEndTime, setFormEndTime] = useState('');
     const [validated, setValidated] = useState(false);
@@ -61,11 +75,12 @@ const EmployeeAvailability = () => {
             event.preventDefault();
 
             var event = { date: event.target.date.value, startTime: event.target.startTime.value, endTime: event.target.endTime.value };
-
-            axios.post(`http://localhost:8080/employees/${userId}/availabilities`, event)
+            if(currentAvalId === "") {
+                axios.post(`http://localhost:8080/employees/${userId}/availabilities`, event)
                 .then(response => {
                     console.log(response);
-                    window.location.reload();
+                    handleClose();
+                    updateEvents();
                 })
                 .catch(error => {
                     if (error.response) {
@@ -77,9 +92,61 @@ const EmployeeAvailability = () => {
                     console.error('There was an error!');
                 });
 
+            } else {
+                axios.put(`http://localhost:8080/employees/${userId}/availabilities/${currentAvalId}`, event)
+                .then(response => {
+                    console.log(response);
+                    handleClose();
+                    updateEvents();
+                })
+                .catch(error => {
+                    if (error.response) {
+                        setErrorMessage(error.response.data.message);
+                    } else {
+                        setErrorMessage(error.message);
+                    }
+                    setShowMessage(true);
+                    console.error('There was an error!');
+                });
+
+            }
+            
         }
         setValidated(true);
     };
+
+    const handleDelete = () => {
+        axios.delete(`http://localhost:8080/employees/${userId}/availabilities/${currentAvalId}`)
+        .then(response => {
+            console.log(response);
+            setCurrentAvalId("");
+            handleClose();
+            updateEvents();
+        })
+        .catch(error => {
+            if (error.response) {
+                setErrorMessage(error.response.data.message);
+            } else {
+                setErrorMessage(error.message);
+            }
+            setShowMessage(true);
+            console.error('There was an error!');
+        });
+    }
+
+    function handleEventClick(eventInfo) {
+        const availabilityId = eventInfo.event._def.extendedProps.availibilityId;
+        console.log("Event has been clicked", eventInfo.event._instance.range);
+        setCurrentAvalId(availabilityId);
+        var start = new Date(eventInfo.event._instance.range.start);
+        var end = new Date(eventInfo.event._instance.range.end);
+        setFormDate(start.toISOString().split('T')[0]);
+        setFormStartTime(start.toISOString().substring(11,16));
+        setFormEndTime(end.toISOString().substring(11,16));
+        setCurrentAvalId(availabilityId);
+        setShowDelete(true);
+        setShow(true);
+    }
 
     return (
         <div className="book-visit">
@@ -97,16 +164,20 @@ const EmployeeAvailability = () => {
                 centered
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Add new availability</Modal.Title>
+                    {currentAvalId === "" && <Modal.Title> Add new availability</Modal.Title>}
+                    {currentAvalId !== "" && <Modal.Title> Edit availability</Modal.Title>}
                 </Modal.Header>
                 <Modal.Body>
                     <Alert show={showMessage} variant="danger">
                         Something went wrong! {errorMessage}
                     </Alert>
+                    {showDelete && <Button variant="danger" onClick={handleDelete}>Delete</Button>}
                     <Form noValidate validated={validated} onSubmit={handleSave}>
                         <Form.Group className="mb-3" controlId="modalDayControl">
                             <Form.Label>Enter day</Form.Label>
-                            <Form.Control required type="date" name="date" autoFocus />
+                            <Form.Control required type="date" name="date" autoFocus
+                                value={formDate}
+                                onChange={e => setFormDate(e.target.value)} />
                             <Form.Control.Feedback type="invalid">
                                 Please provide a date.
                             </Form.Control.Feedback>
@@ -163,14 +234,10 @@ function renderEventContent(eventInfo) {
     return (
         <>
             <b>{eventInfo.timeText}</b>
-            <i>{eventInfo.event.title}</i>
+            <p>{eventInfo.event.title}</p>
         </>
     )
 }
 
-function handleEventClick(eventInfo) {
-    //TODO: handle event clicking
-    console.log("Event has been clicked");
-}
 
 export default EmployeeAvailability;
