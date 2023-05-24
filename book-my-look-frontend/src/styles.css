@@ -24,3 +24,20 @@ body {
 .navbar-color {
     background-color: #c771b9;
 }
+.btn-pink {
+    background-color: #c771b9 !important;
+    color: white  !important;
+}
+.book-visit .btn-pink {
+    background-color: #7d4875 !important;
+    color: white !important;
+}
+
+.delete-button-div {
+    margin-bottom: 20px;
+}
+
+.book-visit a {
+    color: #292b2c  ;
+    text-decoration: none;
+}

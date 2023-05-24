@@ -14,12 +14,11 @@ const EmployeeAvailability = () => {
     const params = useParams();
     const userId = params.userId;
     var date = new Date();
-    const start = startOfWeek(date, { weekStartsOn: 1 }).toISOString().split('T')[0];
-    const end = endOfWeek(date, { weekStartsOn: 1 }).toISOString().split('T')[0];
-
+    const [startDate, setStartDate] = useState(startOfWeek(date, { weekStartsOn: 1 }).toISOString().split('T')[0]);
+    const [endDate, setEndDate] = useState(endOfWeek(date, { weekStartsOn: 1 }).toISOString().split('T')[0]);
     const [events, setEvents] = useState([]);
 
-    const updateEvents = () => {
+    const updateEvents = (start, end) => {
         axios.get(`http://localhost:8080/employees/${userId}/availabilities?startDate=${start}&endDate=${end}`)
             .then(res => {
                 const newEvents = res.data.map(aval => {
@@ -32,13 +31,14 @@ const EmployeeAvailability = () => {
     }
 
     useEffect(() => {
-        updateEvents();
+        updateEvents(startDate, endDate);
     }, []);
 
 
     const [show, setShow] = useState(false);
     const handleShow = () => setShow(true);
     const handleClose = () => {
+        setShow(false);
         setShowMessage(false);
         setCurrentAvalId("");
         setFormDate("");
@@ -46,7 +46,6 @@ const EmployeeAvailability = () => {
         setFormEndTime("");
         setValidated(false);
         setShowDelete(false);
-        setShow(false);
     }
     const [errorMessage, setErrorMessage] = useState("");
     const [showMessage, setShowMessage] = useState(false);
@@ -75,63 +74,63 @@ const EmployeeAvailability = () => {
             event.preventDefault();
 
             var event = { date: event.target.date.value, startTime: event.target.startTime.value, endTime: event.target.endTime.value };
-            if(currentAvalId === "") {
+            if (currentAvalId === "") {
                 axios.post(`http://localhost:8080/employees/${userId}/availabilities`, event)
-                .then(response => {
-                    console.log(response);
-                    handleClose();
-                    updateEvents();
-                })
-                .catch(error => {
-                    if (error.response) {
-                        setErrorMessage(error.response.data.message);
-                    } else {
-                        setErrorMessage(error.message);
-                    }
-                    setShowMessage(true);
-                    console.error('There was an error!');
-                });
+                    .then(response => {
+                        console.log(response);
+                        handleClose();
+                        updateEvents(startDate, endDate);
+                    })
+                    .catch(error => {
+                        if (error.response) {
+                            setErrorMessage(error.response.data.message);
+                        } else {
+                            setErrorMessage(error.message);
+                        }
+                        setShowMessage(true);
+                        console.error('There was an error!');
+                    });
 
             } else {
                 axios.put(`http://localhost:8080/employees/${userId}/availabilities/${currentAvalId}`, event)
-                .then(response => {
-                    console.log(response);
-                    handleClose();
-                    updateEvents();
-                })
-                .catch(error => {
-                    if (error.response) {
-                        setErrorMessage(error.response.data.message);
-                    } else {
-                        setErrorMessage(error.message);
-                    }
-                    setShowMessage(true);
-                    console.error('There was an error!');
-                });
+                    .then(response => {
+                        console.log(response);
+                        handleClose();
+                        updateEvents(startDate, endDate);
+                    })
+                    .catch(error => {
+                        if (error.response) {
+                            setErrorMessage(error.response.data.message);
+                        } else {
+                            setErrorMessage(error.message);
+                        }
+                        setShowMessage(true);
+                        console.error('There was an error!');
+                    });
 
             }
-            
+
         }
         setValidated(true);
     };
 
     const handleDelete = () => {
         axios.delete(`http://localhost:8080/employees/${userId}/availabilities/${currentAvalId}`)
-        .then(response => {
-            console.log(response);
-            setCurrentAvalId("");
-            handleClose();
-            updateEvents();
-        })
-        .catch(error => {
-            if (error.response) {
-                setErrorMessage(error.response.data.message);
-            } else {
-                setErrorMessage(error.message);
-            }
-            setShowMessage(true);
-            console.error('There was an error!');
-        });
+            .then(response => {
+                console.log(response);
+                setCurrentAvalId("");
+                handleClose();
+                updateEvents(startDate, endDate);
+            })
+            .catch(error => {
+                if (error.response) {
+                    setErrorMessage(error.response.data.message);
+                } else {
+                    setErrorMessage(error.message);
+                }
+                setShowMessage(true);
+                console.error('There was an error!');
+            });
     }
 
     function handleEventClick(eventInfo) {
@@ -141,20 +140,28 @@ const EmployeeAvailability = () => {
         var start = new Date(eventInfo.event._instance.range.start);
         var end = new Date(eventInfo.event._instance.range.end);
         setFormDate(start.toISOString().split('T')[0]);
-        setFormStartTime(start.toISOString().substring(11,16));
-        setFormEndTime(end.toISOString().substring(11,16));
+        setFormStartTime(start.toISOString().substring(11, 16));
+        setFormEndTime(end.toISOString().substring(11, 16));
         setCurrentAvalId(availabilityId);
         setShowDelete(true);
         setShow(true);
     }
 
+
+    function handleDatesSet(dateInfo) {
+        console.log("Date has been clicked", dateInfo);
+        console.log(dateInfo.startStr.split('T')[0]);
+        var start = dateInfo.startStr.split('T')[0];
+        var end = dateInfo.endStr.split('T')[0];
+        setStartDate(start);
+        setEndDate(end);
+        updateEvents(start, end);
+
+    }
+
     return (
         <div className="book-visit">
-            <h2>Availability</h2>
-            <Button variant="primary" onClick={handleShow}>
-                Add availability
-            </Button>
-
+            <h2>My availability</h2>
             <Modal
                 show={show}
                 onHide={handleClose}
@@ -171,7 +178,7 @@ const EmployeeAvailability = () => {
                     <Alert show={showMessage} variant="danger">
                         Something went wrong! {errorMessage}
                     </Alert>
-                    {showDelete && <Button variant="danger" onClick={handleDelete}>Delete</Button>}
+                    {showDelete && <div className="delete-button-div"><Button variant="danger" className="float-end" onClick={handleDelete}>Delete</Button></div>}
                     <Form noValidate validated={validated} onSubmit={handleSave}>
                         <Form.Group className="mb-3" controlId="modalDayControl">
                             <Form.Label>Enter day</Form.Label>
@@ -201,13 +208,18 @@ const EmployeeAvailability = () => {
                             </Form.Control.Feedback>
                         </Form.Group>
                         <div className="col-md-12 text-center">
-                            <Button type="submit" variant="primary">Save</Button>
+                            <Button type="submit" variant="pink">Save</Button>
                         </div>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
                 </Modal.Footer>
             </Modal>
+            <div className="col-md-12 text-center">
+                <Button variant="pink" onClick={handleShow}>
+                    Add availability
+                </Button>
+            </div>
             <FullCalendar
                 plugins={[timeGridPlugin]}
                 initialView='timeGridWeek'
@@ -223,8 +235,10 @@ const EmployeeAvailability = () => {
                 eventDisplay="block"
                 displayEventEnd={true}
                 eventBackgroundColor="#c771b9"
+                eventBorderColor="#7d4875"
                 eventContent={renderEventContent}
                 eventClick={handleEventClick}
+                datesSet={handleDatesSet}
             />
         </div>
     );
