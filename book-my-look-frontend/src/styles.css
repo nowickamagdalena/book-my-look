@@ -1,14 +1,43 @@
+html, body, #app, #app>div {
+    height: 100%
+  }
+  body > #root > div {
+    height: 100%;
+  }
 body {
     margin: 0;
     padding-top: 60px;
+    height: 100%;
 }
 
 .content {
     padding: 20px;
     display: flex;
     justify-content: center;
+    height: calc(100% - (20px * 2)) ;
+}
+
+.book-visit {
+    width: 80%;
 }
 
 .navbar-color {
     background-color: #c771b9;
+}
+.btn-pink {
+    background-color: #c771b9 !important;
+    color: white  !important;
+}
+.book-visit .btn-pink {
+    background-color: #7d4875 !important;
+    color: white !important;
+}
+
+.delete-button-div {
+    margin-bottom: 20px;
+}
+
+.book-visit a {
+    color: #292b2c  ;
+    text-decoration: none;
 }

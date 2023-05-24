@@ -5,6 +5,7 @@ import Contact   from "./pages/Contact";
 import BookVisit from "./pages/BookVisit";
 import EmployeeLogin from "./pages/EmployeeLogin";
 import OurTeam from "./pages/OurTeam";
+import EmployeeAvailability from './pages/EmployeeAvailability';
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
                     <Route path="/book-visit" element={<BookVisit />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/employee-login" element={<EmployeeLogin />} />
+                    <Route path="/availability/:userId" element={<EmployeeAvailability />} />
                 </Routes>
             </div>
         </div>
