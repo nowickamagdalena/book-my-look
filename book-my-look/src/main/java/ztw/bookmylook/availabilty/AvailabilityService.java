@@ -7,6 +7,7 @@ import ztw.bookmylook.employee.EmployeeService;
 import ztw.bookmylook.exceptions.AvailabilityConflictException;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -55,6 +56,14 @@ public class AvailabilityService {
         return availabilityRepository.save(availability);
     }
 
+    public Availability checkIfEmployeeIsAvailable(long employeeId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+
+        return availabilityRepository.findAllByEmployeeIdAndDate(employeeId, date).stream()
+                .filter(a -> !a.getStartTime().isAfter(startTime) && !a.getEndTime().isBefore(endTime))
+                .findFirst()
+                .orElse(null);
+    }
+
     private void checkIfEmployeeHasAccessToAvailability(long employeeId, Availability availability) {
         if (employeeId != availability.getEmployeeId()) {
             throw new IllegalArgumentException("Availability with id " + availability.getId() + " does not belong to " +
@@ -81,8 +90,8 @@ public class AvailabilityService {
 
     private boolean hasConflictWithOtherAvailability(Availability availability, Availability other) {
         return (availability.getId() == null || !availability.getId().equals(other.getId()))
-                && !(!other.getEndTime().isAfter(availability.getStartTime())
-                || !other.getStartTime().isBefore(availability.getEndTime()));
+                && !(other.getEndTime().isBefore(availability.getStartTime())
+                || other.getStartTime().isAfter(availability.getEndTime()));
     }
 
     private Availability getAvailabilityById(long id) throws NoSuchElementException {
@@ -90,4 +99,5 @@ public class AvailabilityService {
                 () -> new NoSuchElementException("Availability with id " + id + " does not exist")
         );
     }
+
 }

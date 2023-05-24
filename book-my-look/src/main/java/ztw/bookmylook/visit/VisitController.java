@@ -2,12 +2,11 @@ package ztw.bookmylook.visit;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ztw.bookmylook.visit.dto.VisitDto;
+import ztw.bookmylook.visit.dto.VisitPostDto;
 import ztw.bookmylook.visit.dto.VisitSlotDto;
 
 import java.time.LocalDate;
@@ -42,5 +41,31 @@ public class VisitController {
         return ResponseEntity.ok(
                 visitService.getEmployeesSlotsForSalonService(employeeId, salonServiceId, startDate, endDate)
         );
+    }
+
+    @PostMapping("/visits")
+    @Operation(summary = "Add visit booked by client", description = "Add visit booked by client")
+    public ResponseEntity<Visit> addVisit(
+            @RequestBody VisitPostDto visit
+    ) {
+        return new ResponseEntity<>(visitService.addVisit(visit), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/visits/{visitId}")
+    @Operation(summary = "Update visit", description = "Update visit")
+    public ResponseEntity<Visit> updateVisit(
+            @PathVariable long visitId,
+            @RequestBody VisitPostDto visit
+    ) {
+        return ResponseEntity.ok(visitService.updateVisit(visitId, visit));
+    }
+
+    @DeleteMapping("/visits/{visitId}")
+    @Operation(summary = "Delete visit", description = "Delete visit")
+    public ResponseEntity<Void> deleteVisit(
+            @PathVariable long visitId
+    ) {
+        visitService.deleteVisit(visitId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

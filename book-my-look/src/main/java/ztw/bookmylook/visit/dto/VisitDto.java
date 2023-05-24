@@ -2,13 +2,15 @@ package ztw.bookmylook.visit.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import ztw.bookmylook.visit.Client;
+import ztw.bookmylook.client.dto.ClientDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Getter
 public class VisitDto {
+    @Schema(description = "Visit id", example = "1")
+    private Long id;
     @Schema(description = "Visit date", example = "2021-06-01")
     private final LocalDate date;
     @Schema(description = "Visit start time", example = "10:00")
@@ -17,9 +19,10 @@ public class VisitDto {
     private final LocalTime endTime;
     @Schema(description = "Salon service name", example = "Haircut")
     private final String salonServiceName;
-    private final Client client;
+    private final ClientDto client;
 
-    public VisitDto(LocalDate date, LocalTime startTime, LocalTime endTime, String salonServiceName, Client client) {
+    public VisitDto(Long id, LocalDate date, LocalTime startTime, LocalTime endTime, String salonServiceName, ClientDto client) {
+        this.id = id;
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;

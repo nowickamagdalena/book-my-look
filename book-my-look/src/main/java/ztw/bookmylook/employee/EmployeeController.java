@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController("/employees")
+@RestController
 public class EmployeeController {
     private final EmployeeService employeeService;
 
@@ -16,16 +16,21 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @GetMapping
+    @GetMapping("/employees")
     @Operation(summary = "Get all employees")
     public ResponseEntity<List<Employee>> getAllEmployees(){
         return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/employees/{id}")
     @Operation(summary = "Get employee by id")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable long id) {
         return ResponseEntity.ok(employeeService.getEmployeeById(id));
     }
 
+    @GetMapping("/employees/services/{serviceId}")
+    @Operation(summary = "Get employees who provide service with given id")
+    public ResponseEntity<List<Employee>> getEmployeesByServiceId(@PathVariable long serviceId) {
+        return ResponseEntity.ok(employeeService.getEmployeesByServiceId(serviceId));
+    }
 }

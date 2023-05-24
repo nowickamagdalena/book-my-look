@@ -3,10 +3,14 @@ package ztw.bookmylook.visit;
 import org.springframework.stereotype.Service;
 import ztw.bookmylook.availabilty.Availability;
 import ztw.bookmylook.availabilty.AvailabilityService;
+import ztw.bookmylook.client.Client;
+import ztw.bookmylook.client.ClientService;
+import ztw.bookmylook.employee.Employee;
 import ztw.bookmylook.employee.EmployeeService;
 import ztw.bookmylook.salonservice.SalonService;
 import ztw.bookmylook.salonservice.SalonServiceRepository;
 import ztw.bookmylook.visit.dto.VisitDto;
+import ztw.bookmylook.visit.dto.VisitPostDto;
 import ztw.bookmylook.visit.dto.VisitSlotDto;
 
 import java.time.LocalDate;
@@ -27,12 +31,16 @@ public class VisitService {
     private final AvailabilityService availabilityService;
     private final EmployeeService employeeService;
 
+    private final ClientService clientService;
+
     public VisitService(VisitRepository visitRepository, AvailabilityService availabilityService,
-                        SalonServiceRepository salonServiceRepository, EmployeeService employeeService) {
+                        SalonServiceRepository salonServiceRepository, EmployeeService employeeService,
+                        ClientService clientService) {
         this.visitRepository = visitRepository;
         this.availabilityService = availabilityService;
         this.salonServiceRepository = salonServiceRepository;
         this.employeeService = employeeService;
+        this.clientService = clientService;
     }
 
     public List<VisitDto> getVisitsForEmployee(long employeeId, LocalDate startDate, LocalDate endDate) {
@@ -41,7 +49,8 @@ public class VisitService {
 
         return visitRepository.findAllByEmployeeIdAndDateBetween(employeeId, startDate, endDate).stream()
                 .map(v -> new VisitDto(
-                        v.getDate(), v.getStartTime(), v.getEndTime(), v.getSalonService().getName(), v.getClient())
+                        v.getId(), v.getDate(), v.getStartTime(), v.getEndTime(), v.getSalonService().getName(),
+                        clientService.mapClientToDto(v.getClient()))
                 )
                 .toList();
     }
@@ -93,5 +102,64 @@ public class VisitService {
         return bookedVisits.stream().allMatch(v -> !v.getStartTime().isBefore(slotEndTime)
                 || !v.getStartTime().plusMinutes(v.getDuration()).isAfter(currentStartTime)
         );
+    }
+
+    public Visit addVisit(VisitPostDto visit) {
+        Employee employee = employeeService.getEmployeeById(visit.getEmployeeId());
+        SalonService salonService = salonServiceRepository.findById(visit.getSalonServiceId()).orElseThrow(
+                () -> new NoSuchElementException("Salon service with id " + visit.getSalonServiceId() + " does not exist")
+        );
+
+        checkIfEmployeeHasSalonService(employee, visit.getSalonServiceId());
+        checkIfEmployeeIsAvailable(employee, visit.getDate(), visit.getStartTime(), salonService);
+
+        Client client = clientService.addClient(visit.getClient());
+        Visit newVisit = new Visit(visit.getDate(), visit.getStartTime(), salonService, employee, client);
+        return visitRepository.save(newVisit);
+    }
+
+
+    public Visit updateVisit(long visitId, VisitPostDto visit) {
+        Visit visitToUpdate = visitRepository.findById(visitId).orElseThrow(
+                () -> new NoSuchElementException("Visit with id " + visitId + " does not exist")
+        );
+        Employee employee = employeeService.getEmployeeById(visit.getEmployeeId());
+        SalonService salonService = salonServiceRepository.findById(visit.getSalonServiceId()).orElseThrow(
+                () -> new NoSuchElementException("Salon service with id " + visit.getSalonServiceId() + " does not exist")
+        );
+
+        checkIfEmployeeHasSalonService(employee, visit.getSalonServiceId());
+        checkIfEmployeeIsAvailable(employee, visit.getDate(), visit.getStartTime(), salonService);
+
+        visitToUpdate.setDate(visit.getDate());
+        visitToUpdate.setStartTime(visit.getStartTime());
+        visitToUpdate.setSalonService(salonService);
+        visitToUpdate.setEmployee(employee);
+
+        Client client = visitToUpdate.getClient();
+        clientService.updateClient(client.getId(), visit.getClient());
+
+        return visitRepository.save(visitToUpdate);
+    }
+
+    public void deleteVisit(long visitId) {
+        visitRepository.deleteById(visitId);
+    }
+
+    private void checkIfEmployeeHasSalonService(Employee employee, long salonServiceId){
+        // Check if employee offers chosen salon service
+        if (!employeeService.checkIfEmployeeHasSalonService(employee.getId(), salonServiceId)) {
+            throw new IllegalArgumentException("Employee with id " + employee.getId() +
+                    " does not have salon service with id " + salonServiceId);
+        }
+    }
+
+    private void checkIfEmployeeIsAvailable(Employee employee, LocalDate date, LocalTime startTime, SalonService salonService){
+        // Check if employee is available between start and end time
+        LocalTime endTime = startTime.plusMinutes(salonService.getDuration());
+        if(availabilityService.checkIfEmployeeIsAvailable(employee.getId(), date, startTime, endTime)==null){
+            throw new IllegalArgumentException("Employee with id " + employee.getId() +
+                    " is not available on " + date + " between " + startTime + " and " + endTime);
+        }
     }
 }
