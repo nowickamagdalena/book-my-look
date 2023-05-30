@@ -26,13 +26,16 @@ public class WebSecurityConfiguration {
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         GoogleTokenFilter googleTokenFilter = new GoogleTokenFilter(googleAuthService);
         http.cors().and()
-                .csrf().disable()
-                .addFilterBefore(googleTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(filterChainExceptionHandler, GoogleTokenFilter.class)
-                .sessionManagement().sessionCreationPolicy(STATELESS).and()
-                .authorizeRequests()
+                .csrf().disable();
+
+        http.authorizeRequests()
+                .antMatchers("/salonservices/**").permitAll()
                 .antMatchers("/employees/**").authenticated()
                 .anyRequest().permitAll();
+
+        http.addFilterBefore(googleTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(filterChainExceptionHandler, GoogleTokenFilter.class)
+                .sessionManagement().sessionCreationPolicy(STATELESS);
 
         http.headers().frameOptions().disable();
         return http.build();

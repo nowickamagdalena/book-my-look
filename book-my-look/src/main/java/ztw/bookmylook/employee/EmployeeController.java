@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import ztw.bookmylook.employee.dto.EmployeeDetailsDTO;
 
 import java.util.List;
 
@@ -12,14 +13,20 @@ import java.util.List;
 public class EmployeeController {
     private final EmployeeService employeeService;
 
-    public EmployeeController(EmployeeService employeeService){
+    public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
 
     @GetMapping("/employees")
     @Operation(summary = "Get all employees")
-    public ResponseEntity<List<Employee>> getAllEmployees(){
+    public ResponseEntity<List<Employee>> getAllEmployees() {
         return ResponseEntity.ok(employeeService.getAllEmployees());
+    }
+
+    @GetMapping("/employees/{email}/details")
+    @Operation(summary = "Get logged employee details")
+    public ResponseEntity<EmployeeDetailsDTO> getEmployeeDetailsByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(Employee.toEmployeeDetailsDTO(employeeService.getEmployeeByEmail(email)));
     }
 
     @GetMapping("/employees/{id}")

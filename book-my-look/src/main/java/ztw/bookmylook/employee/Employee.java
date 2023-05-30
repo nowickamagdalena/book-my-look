@@ -3,6 +3,7 @@ package ztw.bookmylook.employee;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ztw.bookmylook.employee.dto.EmployeeDetailsDTO;
 import ztw.bookmylook.salonservice.SalonService;
 
 import javax.persistence.*;
@@ -18,8 +19,8 @@ public class Employee {
     private long id;
     private String firstName;
     private String lastName;
+    @Column(unique = true)
     private String email;
-    private String password;
 
     @ManyToMany
     @JoinTable(
@@ -29,10 +30,18 @@ public class Employee {
     )
     private Set<SalonService> availableServices;
 
-    public Employee(String firstName, String lastName, String email, String password) {
+    public Employee(String firstName, String lastName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.password = password;
+    }
+
+    public static EmployeeDetailsDTO toEmployeeDetailsDTO(Employee employee) {
+        return new EmployeeDetailsDTO(
+                employee.getId(),
+                employee.getFirstName(),
+                employee.getLastName(),
+                employee.getEmail()
+        );
     }
 }

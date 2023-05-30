@@ -1,21 +1,11 @@
 import { useEffect, useState } from "react";
 import jwt_decode from "jwt-decode";
+import axios from 'axios';
+import getLoggedUser from "../auth/auth";
+import Button from 'react-bootstrap/Button';
 
 const EmployeeLogin = () => {
     const [user, setUser] = useState({});
-
-    function handleCallbackResponse(response) {
-        console.log("Encoded JWT ID token: " + response.credential);
-        var userObject = jwt_decode(response.credential);
-        console.log(userObject);
-        document.getElementById("signInDiv").hidden = true;
-        setUser(userObject);
-    }
-
-    function handleSignOut(response) {
-        setUser({});
-        document.getElementById("signInDiv").hidden = false;
-    }
 
     useEffect(() => {
         /* global google */
@@ -29,7 +19,43 @@ const EmployeeLogin = () => {
             { theme: "outline", size: "large" }
         )
 
+        const loggedInUser = getLoggedUser();
+        if (loggedInUser) {
+          setUser(loggedInUser);
+          document.getElementById("signInDiv").hidden = false;
+        }
     }, []);
+
+    function handleCallbackResponse(response) {
+        console.log("Encoded JWT ID token: " + response.credential);
+        const id_token = response.credential;
+        const decodedUser = jwt_decode(response.credential);
+
+        axios.get(`http://localhost:8080/employees/${decodedUser.email}/details`, {
+            headers: {
+                'Authorization': `Bearer ${id_token}`
+            }
+        })
+            .then((res) => {
+                const userData = res.data;
+                const userObject = { employeeId: userData.id, firstName: userData.firstName, lastName: userData.lastName, email: userData.email, id_token: id_token };
+                document.getElementById("signInDiv").hidden = true;
+                setUser(userObject);
+                localStorage.setItem("user", JSON.stringify(userObject));
+            })
+            .catch((error) => {
+                //TODO: display error to user
+                console.error(error);
+            })
+
+    }
+
+    function handleSignOut(response) {
+        setUser({});
+        localStorage.clear();
+        document.getElementById("signInDiv").hidden = false;
+    }
+
 
     return (
         <div className="employee-login">
@@ -38,8 +64,8 @@ const EmployeeLogin = () => {
             {
                 user && <div id="logoutDiv"></div>
             }
-            {Object.keys(user).length != 0 &&
-                <button onClick={(e) => handleSignOut(e)}>Sign out</button>
+            {Object.keys(user).length !== 0 &&
+             <Button variant="secondary" onClick={(e) => handleSignOut(e)}>Sign out</Button>
             }
         </div>
     );
