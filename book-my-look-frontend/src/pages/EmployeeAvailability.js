@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from 'axios';
-import { useParams } from "react-router-dom";
 import { startOfWeek, endOfWeek } from 'date-fns'
 import FullCalendar from '@fullcalendar/react'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -8,25 +7,40 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Alert from "react-bootstrap/Alert";
+import getLoggedUser from "../auth/auth";
 
 
 const EmployeeAvailability = () => {
-    const params = useParams();
-    const userId = params.userId;
-    var date = new Date();
-    const [startDate, setStartDate] = useState(startOfWeek(date, { weekStartsOn: 1 }).toISOString().split('T')[0]);
-    const [endDate, setEndDate] = useState(endOfWeek(date, { weekStartsOn: 1 }).toISOString().split('T')[0]);
+    const loggedInUser = getLoggedUser();
+    console.log(loggedInUser);
+    const [startDate, setStartDate] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0]);
+    const [endDate, setEndDate] = useState(endOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0]);
     const [events, setEvents] = useState([]);
 
+    const [show, setShow] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [showMessage, setShowMessage] = useState(false);
+    const [showDelete, setShowDelete] = useState(false);
+
+    const [currentAvalId, setCurrentAvalId] = useState('');
+    const [formDate, setFormDate] = useState('');
+    const [formStartTime, setFormStartTime] = useState('');
+    const [formEndTime, setFormEndTime] = useState('');
+    const [validated, setValidated] = useState(false);
+
     const updateEvents = (start, end) => {
-        axios.get(`http://localhost:8080/employees/${userId}/availabilities?startDate=${start}&endDate=${end}`)
+        axios.get(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities?startDate=${start}&endDate=${end}`, {
+            headers: {
+                'Authorization': `Bearer ${loggedInUser.id_token}`
+            }
+        })
             .then(res => {
                 const newEvents = res.data.map(aval => {
                     return { title: "Available", start: `${aval.date}T${aval.startTime}`, end: `${aval.date}T${aval.endTime}`, availibilityId: aval.id };
                 });
                 setEvents(newEvents);
             }).catch(error => {
-                console.error('There was an error!');
+                console.error('There was an error!' + error);
             });
     }
 
@@ -34,8 +48,6 @@ const EmployeeAvailability = () => {
         updateEvents(startDate, endDate);
     }, []);
 
-
-    const [show, setShow] = useState(false);
     const handleShow = () => setShow(true);
     const handleClose = () => {
         setShow(false);
@@ -47,15 +59,6 @@ const EmployeeAvailability = () => {
         setValidated(false);
         setShowDelete(false);
     }
-    const [errorMessage, setErrorMessage] = useState("");
-    const [showMessage, setShowMessage] = useState(false);
-    const [showDelete, setShowDelete] = useState(false);
-
-    const [currentAvalId, setCurrentAvalId] = useState('');
-    const [formDate, setFormDate] = useState('');
-    const [formStartTime, setFormStartTime] = useState('');
-    const [formEndTime, setFormEndTime] = useState('');
-    const [validated, setValidated] = useState(false);
 
     const handleSave = (event) => {
         const form = event.currentTarget;
@@ -73,9 +76,14 @@ const EmployeeAvailability = () => {
         } else {
             event.preventDefault();
 
-            var event = { date: event.target.date.value, startTime: event.target.startTime.value, endTime: event.target.endTime.value };
+            const eventdata = { date: event.target.date.value, startTime: event.target.startTime.value, endTime: event.target.endTime.value };
+
             if (currentAvalId === "") {
-                axios.post(`http://localhost:8080/employees/${userId}/availabilities`, event)
+                axios.post(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities`, eventdata, {
+                    headers: {
+                        'Authorization': `Bearer ${loggedInUser.id_token}`
+                    }
+                })
                     .then(response => {
                         console.log(response);
                         handleClose();
@@ -92,7 +100,11 @@ const EmployeeAvailability = () => {
                     });
 
             } else {
-                axios.put(`http://localhost:8080/employees/${userId}/availabilities/${currentAvalId}`, event)
+                axios.put(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${currentAvalId}`, eventdata, {
+                    headers: {
+                        'Authorization': `Bearer ${loggedInUser.id_token}`
+                    }
+                })
                     .then(response => {
                         console.log(response);
                         handleClose();
@@ -115,7 +127,7 @@ const EmployeeAvailability = () => {
     };
 
     const handleDelete = () => {
-        axios.delete(`http://localhost:8080/employees/${userId}/availabilities/${currentAvalId}`)
+        axios.delete(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${currentAvalId}`)
             .then(response => {
                 console.log(response);
                 setCurrentAvalId("");

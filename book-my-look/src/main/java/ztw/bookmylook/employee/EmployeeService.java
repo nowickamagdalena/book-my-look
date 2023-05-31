@@ -36,4 +36,9 @@ public class EmployeeService {
     public List<Employee> getEmployeesByServiceId(long serviceId) {
         return employeeRepository.findByAvailableServicesId(serviceId);
     }
+
+    public Employee getEmployeeByEmail(String email) {
+        return employeeRepository.findByEmail(email).orElseThrow(
+                () -> new NoSuchElementException("Employee with email " + email + " does not exist"));
+    }
 }
