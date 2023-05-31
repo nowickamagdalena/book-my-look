@@ -4,12 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ztw.bookmylook.availabilty.dto.AvailabilityDto;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@PreAuthorize("isAuthenticated()")
 @RestController
 public class AvailabilityController {
     private final AvailabilityService availabilityService;

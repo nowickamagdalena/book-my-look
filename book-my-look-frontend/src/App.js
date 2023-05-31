@@ -6,11 +6,15 @@ import BookVisit from "./pages/BookVisit";
 import EmployeeLogin from "./pages/EmployeeLogin";
 import OurTeam from "./pages/OurTeam";
 import EmployeeAvailability from './pages/EmployeeAvailability';
+import EmployeeVisits from './pages/EmployeeVisits';
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+// import useAuth from "./components/AuthContext";
 
-function App() {
+function App() {  
+  
+  // const { auth } = useAuth();
   return (
-      <Router>
+      <Router forceRefresh={true}>
         <div className="App">
             <NavigationBar />
             <div className="content">
@@ -20,7 +24,8 @@ function App() {
                     <Route path="/book-visit" element={<BookVisit />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/employee-login" element={<EmployeeLogin />} />
-                    <Route path="/availability/:userId" element={<EmployeeAvailability />} />
+                    <Route path="/availability" element={<EmployeeAvailability />} />
+                    <Route path="/my-visits" element={<EmployeeVisits />} />
                 </Routes>
             </div>
         </div>

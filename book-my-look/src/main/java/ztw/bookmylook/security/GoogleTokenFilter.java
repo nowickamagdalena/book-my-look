@@ -18,6 +18,9 @@ public class GoogleTokenFilter extends OncePerRequestFilter {
 
     public static final String AUTHENTICATION_HEADER = "Authorization";
     public static final String AUTHENTICATION_HEADER_TOKEN_PREFIX = "Bearer ";
+
+    private static final String OPENAPI_DOCS_URL = "/v3/api-docs";
+    private static final String SWAGGER_UI_URL = "/swagger-ui/";
     private final GoogleAuthService googleAuthService;
 
     public GoogleTokenFilter(GoogleAuthService googleAuthService) {
@@ -30,6 +33,11 @@ public class GoogleTokenFilter extends OncePerRequestFilter {
 
         String authenticationHeader = request.getHeader(AUTHENTICATION_HEADER);
 
+        String path = request.getRequestURI();
+        if (path.startsWith(SWAGGER_UI_URL) || path.startsWith(OPENAPI_DOCS_URL)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         if (authenticationHeader == null || !authenticationHeader.startsWith(AUTHENTICATION_HEADER_TOKEN_PREFIX)) {
             filterChain.doFilter(request, response);
             return;

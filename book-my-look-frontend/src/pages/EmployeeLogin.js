@@ -3,9 +3,12 @@ import jwt_decode from "jwt-decode";
 import axios from 'axios';
 import getLoggedUser from "../auth/auth";
 import Button from 'react-bootstrap/Button';
+import { useNavigate } from "react-router-dom";
 
 const EmployeeLogin = () => {
     const [user, setUser] = useState({});
+    const navigate = useNavigate();
+        const loggedInUser = getLoggedUser();
 
     useEffect(() => {
         /* global google */
@@ -19,7 +22,6 @@ const EmployeeLogin = () => {
             { theme: "outline", size: "large" }
         )
 
-        const loggedInUser = getLoggedUser();
         if (loggedInUser) {
           setUser(loggedInUser);
           document.getElementById("signInDiv").hidden = false;
@@ -42,6 +44,8 @@ const EmployeeLogin = () => {
                 document.getElementById("signInDiv").hidden = true;
                 setUser(userObject);
                 localStorage.setItem("user", JSON.stringify(userObject));
+                navigate("/availability");
+                navigate(0);
             })
             .catch((error) => {
                 //TODO: display error to user
@@ -54,6 +58,8 @@ const EmployeeLogin = () => {
         setUser({});
         localStorage.clear();
         document.getElementById("signInDiv").hidden = false;
+        navigate("/");
+        navigate(0);
     }
 
 
