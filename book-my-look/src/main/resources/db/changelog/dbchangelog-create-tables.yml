@@ -1,0 +1,238 @@
+databaseChangeLog:
+- changeSet:
+    id: 1685539948929-1
+    author: Magdalena (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              primaryKey: true
+              primaryKeyName: availability_pkey
+            name: id
+            type: BIGSERIAL
+        - column:
+            name: date
+            type: date
+        - column:
+            name: end_time
+            type: TIME WITHOUT TIME ZONE
+        - column:
+            name: start_time
+            type: TIME WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: employee_id
+            type: BIGINT
+        tableName: availability
+- changeSet:
+    id: 1685539948929-2
+    author: Magdalena (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              primaryKey: true
+              primaryKeyName: client_pkey
+            name: id
+            type: BIGSERIAL
+        - column:
+            name: additional_info
+            type: VARCHAR(255)
+        - column:
+            name: email
+            type: VARCHAR(255)
+        - column:
+            name: first_name
+            type: VARCHAR(255)
+        - column:
+            name: last_name
+            type: VARCHAR(255)
+        - column:
+            name: phone_number
+            type: VARCHAR(255)
+        tableName: client
+- changeSet:
+    id: 1685539948929-3
+    author: Magdalena (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              primaryKey: true
+              primaryKeyName: employee_pkey
+            name: id
+            type: BIGSERIAL
+        - column:
+            name: email
+            type: VARCHAR(255)
+        - column:
+            name: first_name
+            type: VARCHAR(255)
+        - column:
+            name: last_name
+            type: VARCHAR(255)
+        - column:
+            name: password
+            type: VARCHAR(255)
+        tableName: employee
+- changeSet:
+    id: 1685539948929-4
+    author: Magdalena (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              primaryKey: true
+              primaryKeyName: employee_service_pkey
+            name: employee_id
+            type: BIGINT
+        - column:
+            constraints:
+              primaryKey: true
+              primaryKeyName: employee_service_pkey
+            name: service_id
+            type: BIGINT
+        tableName: employee_service
+- changeSet:
+    id: 1685539948929-5
+    author: Magdalena (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              primaryKey: true
+              primaryKeyName: salon_service_pkey
+            name: id
+            type: BIGSERIAL
+        - column:
+            name: description
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: duration
+            type: INTEGER
+        - column:
+            name: name
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: price
+            type: FLOAT8
+        tableName: salon_service
+- changeSet:
+    id: 1685539948929-6
+    author: Magdalena (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              primaryKey: true
+              primaryKeyName: visit_pkey
+            name: id
+            type: BIGSERIAL
+        - column:
+            name: date
+            type: date
+        - column:
+            name: start_time
+            type: TIME WITHOUT TIME ZONE
+        - column:
+            name: client_id
+            type: BIGINT
+        - column:
+            name: employee_id
+            type: BIGINT
+        - column:
+            name: salon_service_id
+            type: BIGINT
+        tableName: visit
+- changeSet:
+    id: 1685539948929-7
+    author: Magdalena (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: client_id
+        baseTableName: visit
+        constraintName: fk83qviporb5ov1ph00ynyn2bxh
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: client
+        validate: true
+- changeSet:
+    id: 1685539948929-8
+    author: Magdalena (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: service_id
+        baseTableName: employee_service
+        constraintName: fkcgfll5qttsct5guw56tigi2hw
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: salon_service
+        validate: true
+- changeSet:
+    id: 1685539948929-9
+    author: Magdalena (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: employee_id
+        baseTableName: employee_service
+        constraintName: fkda7b49kv115uq8ogetm2vjrdw
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: employee
+        validate: true
+- changeSet:
+    id: 1685539948929-10
+    author: Magdalena (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: employee_id
+        baseTableName: visit
+        constraintName: fkei9cakwkvwbc2gb68ao1sr3yj
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: employee
+        validate: true
+- changeSet:
+    id: 1685539948929-11
+    author: Magdalena (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: salon_service_id
+        baseTableName: visit
+        constraintName: fkf8jce1mbn78gpjxsolkso307m
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: salon_service
+        validate: true
+
