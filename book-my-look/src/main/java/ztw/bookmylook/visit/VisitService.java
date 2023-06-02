@@ -25,7 +25,7 @@ import static ztw.bookmylook.utils.DateUtils.validateDateRange;
 
 @Service
 public class VisitService {
-    public final static int MIN_BLOCK_TIME = 15;
+    public final static int MIN_BLOCK_TIME = 5;
     private final VisitRepository visitRepository;
     private final SalonServiceRepository salonServiceRepository;
     private final AvailabilityService availabilityService;
@@ -112,6 +112,7 @@ public class VisitService {
 
         checkIfEmployeeHasSalonService(employee, visit.getSalonServiceId());
         checkIfEmployeeIsAvailable(employee, visit.getDate(), visit.getStartTime(), salonService);
+        checkIfThereAreNoOtherVisitsInThatTime(employee, visit.getDate(), visit.getStartTime(), salonService);
 
         Client client = clientService.addClient(visit.getClient());
         Visit newVisit = new Visit(visit.getDate(), visit.getStartTime(), salonService, employee, client);
@@ -130,6 +131,7 @@ public class VisitService {
 
         checkIfEmployeeHasSalonService(employee, visit.getSalonServiceId());
         checkIfEmployeeIsAvailable(employee, visit.getDate(), visit.getStartTime(), salonService);
+        checkIfThereAreNoOtherVisitsInThatTime(employee, visit.getDate(), visit.getStartTime(), salonService);
 
         visitToUpdate.setDate(visit.getDate());
         visitToUpdate.setStartTime(visit.getStartTime());
@@ -147,7 +149,6 @@ public class VisitService {
     }
 
     private void checkIfEmployeeHasSalonService(Employee employee, long salonServiceId){
-        // Check if employee offers chosen salon service
         if (!employeeService.checkIfEmployeeHasSalonService(employee.getId(), salonServiceId)) {
             throw new IllegalArgumentException("Employee with id " + employee.getId() +
                     " does not have salon service with id " + salonServiceId);
@@ -155,11 +156,21 @@ public class VisitService {
     }
 
     private void checkIfEmployeeIsAvailable(Employee employee, LocalDate date, LocalTime startTime, SalonService salonService){
-        // Check if employee is available between start and end time
         LocalTime endTime = startTime.plusMinutes(salonService.getDuration());
         if(availabilityService.checkIfEmployeeIsAvailable(employee.getId(), date, startTime, endTime)==null){
             throw new IllegalArgumentException("Employee with id " + employee.getId() +
                     " is not available on " + date + " between " + startTime + " and " + endTime);
+        }
+    }
+
+    private void checkIfThereAreNoOtherVisitsInThatTime(Employee employee, LocalDate date, LocalTime startTime, SalonService salonService) {
+        // check if there are any other visits booked in the same time
+        LocalTime endTime = startTime.plusMinutes(salonService.getDuration());
+        if (visitRepository.findAllByEmployeeIdAndDate(employee.getId(), date).stream()
+                .anyMatch(v -> v.getStartTime().isBefore(endTime)
+                        && v.getStartTime().plusMinutes(v.getDuration()).isAfter(startTime))) {
+            throw new IllegalArgumentException("Employee with id " + employee.getId() +
+                    " has another visit booked on " + date + " between " + startTime + " and " + endTime);
         }
     }
 }
