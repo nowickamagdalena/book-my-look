@@ -12,6 +12,8 @@ import ztw.bookmylook.salonservice.SalonServiceRepository;
 import ztw.bookmylook.visit.dto.VisitDto;
 import ztw.bookmylook.visit.dto.VisitPostDto;
 import ztw.bookmylook.visit.dto.VisitSlotDto;
+import ztw.bookmylook.visitpart.VisitPart;
+import ztw.bookmylook.visitpart.VisitPartId;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -172,5 +174,16 @@ public class VisitService {
             throw new IllegalArgumentException("Employee with id " + employee.getId() +
                     " has another visit booked on " + date + " between " + startTime + " and " + endTime);
         }
+    }
+
+    private List<VisitPart> divideVisitIntoParts(Visit visit, int duration){
+        List<VisitPart> visitParts = new ArrayList<>();
+        LocalTime currentStartTime = visit.getStartTime();
+        LocalTime endTime = currentStartTime.plusMinutes(duration);
+        while (!currentStartTime.plusMinutes(MIN_BLOCK_TIME).isAfter(endTime)) {
+            visitParts.add(new VisitPart(new VisitPartId(visit.getDate(), currentStartTime, visit.getEmployee()), visit));
+            currentStartTime = currentStartTime.plusMinutes(MIN_BLOCK_TIME);
+        }
+        return visitParts;
     }
 }
