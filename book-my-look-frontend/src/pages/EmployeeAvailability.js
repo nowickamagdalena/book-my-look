@@ -127,7 +127,11 @@ const EmployeeAvailability = () => {
     };
 
     const handleDelete = () => {
-        axios.delete(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${currentAvalId}`)
+        axios.delete(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${currentAvalId}`, {
+            headers: {
+                'Authorization': `Bearer ${loggedInUser.id_token}`
+            }
+        })
             .then(response => {
                 console.log(response);
                 setCurrentAvalId("");

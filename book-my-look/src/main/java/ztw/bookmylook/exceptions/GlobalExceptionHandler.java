@@ -25,6 +25,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(VisitAlreadyExistsException.class)
+    public ResponseEntity<ErrorDetails> handleVisitAlreadyExistsException(VisitAlreadyExistsException e,
+                                                                            WebRequest request) {
+        ErrorDetails errorDetails = getErrorDetails(e, request);
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorDetails> handleIllegalArgumentException(IllegalArgumentException e, WebRequest request) {
         ErrorDetails errorDetails = getErrorDetails(e, request);

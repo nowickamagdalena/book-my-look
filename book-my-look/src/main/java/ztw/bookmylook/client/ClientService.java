@@ -33,4 +33,8 @@ public class ClientService {
     public ClientDto mapClientToDto(Client client) {
         return modelMapper.map(client, ClientDto.class);
     }
+
+    public void deleteClient(Long id) {
+        clientRepository.deleteById(id);
+    }
 }
