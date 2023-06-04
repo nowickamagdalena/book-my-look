@@ -14,7 +14,7 @@ import ztw.bookmylook.visit.dto.VisitDto;
 import ztw.bookmylook.visit.dto.VisitPostDto;
 import ztw.bookmylook.visit.dto.VisitSlotDto;
 import ztw.bookmylook.visit.visitpart.VisitPart;
-import ztw.bookmylook.visit.visitpart.VisitPartRepository;
+import ztw.bookmylook.visit.visitpart.VisitPartService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -31,7 +31,7 @@ public class VisitService {
     public final static int MIN_BLOCK_TIME = 5;
     private final VisitRepository visitRepository;
     private final SalonServiceRepository salonServiceRepository;
-    private final VisitPartRepository visitPartRepository;
+    private final VisitPartService visitPartService;
     private final AvailabilityService availabilityService;
     private final EmployeeService employeeService;
 
@@ -39,13 +39,13 @@ public class VisitService {
 
     public VisitService(VisitRepository visitRepository, AvailabilityService availabilityService,
                         SalonServiceRepository salonServiceRepository, EmployeeService employeeService,
-                        ClientService clientService, VisitPartRepository visitPartRepository) {
+                        ClientService clientService, VisitPartService visitPartService) {
         this.visitRepository = visitRepository;
         this.availabilityService = availabilityService;
         this.salonServiceRepository = salonServiceRepository;
         this.employeeService = employeeService;
         this.clientService = clientService;
-        this.visitPartRepository = visitPartRepository;
+        this.visitPartService = visitPartService;
     }
 
     public List<VisitDto> getVisitsForEmployee(long employeeId, LocalDate startDate, LocalDate endDate) {
@@ -117,16 +117,17 @@ public class VisitService {
 
         checkIfEmployeeHasSalonService(employee, visit.getSalonServiceId());
         checkIfEmployeeIsAvailable(employee, visit.getDate(), visit.getStartTime(), salonService);
-        //checkIfThereAreNoOtherVisitsInThatTime(employee, visit.getDate(), visit.getStartTime(), salonService);
+        checkIfThereAreNoOtherVisitsInThatTime(employee, visit.getDate(), visit.getStartTime(), salonService);
 
         Client client = clientService.addClient(visit.getClient());
         Visit newVisit = new Visit(visit.getDate(), visit.getStartTime(), salonService, employee, client);
 
         visitRepository.saveAndFlush(newVisit);
 
+        List<VisitPart> visitParts = divideVisitIntoParts(newVisit, salonService.getDuration());
+
         try {
-            List<VisitPart> visitParts = divideVisitIntoParts(newVisit, salonService.getDuration());
-            visitPartRepository.saveAllAndFlush(visitParts);
+            visitPartService.addVisitParts(visitParts);
         } catch (Exception e) {
             visitRepository.delete(newVisit);
             clientService.deleteClient(client.getId());
@@ -147,21 +148,43 @@ public class VisitService {
 
         checkIfEmployeeHasSalonService(employee, visit.getSalonServiceId());
         checkIfEmployeeIsAvailable(employee, visit.getDate(), visit.getStartTime(), salonService);
-        checkIfThereAreNoOtherVisitsInThatTime(employee, visit.getDate(), visit.getStartTime(), salonService);
 
         visitToUpdate.setDate(visit.getDate());
         visitToUpdate.setStartTime(visit.getStartTime());
         visitToUpdate.setSalonService(salonService);
         visitToUpdate.setEmployee(employee);
 
+
+        List<VisitPart> newVisitParts = divideVisitIntoParts(visitToUpdate, salonService.getDuration());
+        List<VisitPart> visitPartsToDelete = new ArrayList<>();
+
+        visitPartService.updateVisitParts(newVisitParts, visitPartsToDelete, visitId);
+
+        // add new visit parts
+        try {
+            visitPartService.addVisitParts(newVisitParts);
+        } catch (Exception e) {
+            throw new VisitAlreadyExistsException(visitToUpdate.getDate(), visitToUpdate.getStartTime(),
+                    visitToUpdate.getEmployee().getId());
+        }
+
+        // delete visit parts
+        visitPartService.deleteVisitParts(visitPartsToDelete);
+
         Client client = visitToUpdate.getClient();
         clientService.updateClient(client.getId(), visit.getClient());
 
-        return visitRepository.save(visitToUpdate);
+        return visitRepository.saveAndFlush(visitToUpdate);
     }
 
     public void deleteVisit(long visitId) {
+        Visit visit = visitRepository.findById(visitId).orElseThrow(
+                () -> new NoSuchElementException("Visit with id " + visitId + " does not exist")
+        );
+
+        visitPartService.deleteVisitPartsByVisitId(visitId);
         visitRepository.deleteById(visitId);
+        clientService.deleteClient(visit.getClient().getId());
     }
 
     private void checkIfEmployeeHasSalonService(Employee employee, long salonServiceId){
@@ -180,7 +203,6 @@ public class VisitService {
     }
 
     private void checkIfThereAreNoOtherVisitsInThatTime(Employee employee, LocalDate date, LocalTime startTime, SalonService salonService) {
-        // check if there are any other visits booked in the same time
         LocalTime endTime = startTime.plusMinutes(salonService.getDuration());
         if (visitRepository.findAllByEmployeeIdAndDate(employee.getId(), date).stream()
                 .anyMatch(v -> v.getStartTime().isBefore(endTime)
