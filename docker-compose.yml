@@ -10,9 +10,7 @@ services:
       POSTGRES_PASSWORD: root
       POSTGRES_DB: book-my-look-docker
     ports:
-      - 5435:5432  # Change the mapping to a custom port, such as 5435
-    expose:
-      - 5435
+      - 5435:5432
     volumes:
       - db:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d
@@ -25,17 +23,23 @@ services:
     restart: always
     ports:
       - 8080:8080
-    expose:
-      - 8080
     depends_on:
       - db
     networks:
       - db
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/book-my-look-docker  # Update the port here as well
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/book-my-look-docker
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: root
 
+  frontend:
+    container_name: frontend
+    build: ./book-my-look-frontend
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
 
 volumes:
   db:

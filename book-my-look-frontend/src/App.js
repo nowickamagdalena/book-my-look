@@ -6,7 +6,6 @@ import BookVisit from "./pages/BookVisit";
 import EmployeeLogin from "./pages/EmployeeLogin";
 import OurTeam from "./pages/OurTeam";
 import EmployeeAvailability from './pages/EmployeeAvailability';
-import EmployeeVisits from './pages/EmployeeVisits';
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 // import useAuth from "./components/AuthContext";
 
@@ -25,7 +24,6 @@ function App() {
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/employee-login" element={<EmployeeLogin />} />
                     <Route path="/availability" element={<EmployeeAvailability />} />
-                    <Route path="/my-visits" element={<EmployeeVisits />} />
                 </Routes>
             </div>
         </div>
