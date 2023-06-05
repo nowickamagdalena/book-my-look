@@ -1,0 +1,66 @@
+databaseChangeLog:
+- changeSet:
+    id: 1685993166310-7
+    author: Magdalena (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              primaryKey: true
+              primaryKeyName: visit_part_pkey
+            name: id
+            type: BIGSERIAL
+        - column:
+            name: date
+            type: date
+        - column:
+            name: time
+            type: TIME WITHOUT TIME ZONE
+        - column:
+            name: employee_id
+            type: BIGINT
+        - column:
+            name: visit_id
+            type: BIGINT
+        tableName: visit_part
+- changeSet:
+    id: 1685993166310-8
+    author: Magdalena (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: date, time, employee_id
+        constraintName: uniquevisitpart
+        tableName: visit_part
+- changeSet:
+    id: 1685993166310-13
+    author: Magdalena (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: visit_id
+        baseTableName: visit_part
+        constraintName: fkf5unfm60srbb3qn3pjenksl56
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: visit
+        validate: true
+- changeSet:
+    id: 1685993166310-15
+    author: Magdalena (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: employee_id
+        baseTableName: visit_part
+        constraintName: fkthg57dk1e46lgalour88dwfge
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: employee
+        validate: true
+
