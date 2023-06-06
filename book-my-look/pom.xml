@@ -107,7 +107,7 @@
                     <url>jdbc:postgresql://localhost:5432/book-my-look</url>
                     <username>postgres</username>
                     <password>root</password>
-                    <changeLogFile>src/main/resources/db/changelog/dbchangelog.yml</changeLogFile>
+                    <changeLogFile>src/main/resources/db/changelog/dbchangelog-v0.0.1.yml</changeLogFile>
 
                     <outputChangeLogFile>src/main/resources/db/changelog/dbchangelog.yml</outputChangeLogFile>
                 </configuration>
