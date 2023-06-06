@@ -8,12 +8,30 @@ import OurTeam from "./pages/OurTeam";
 import EmployeeAvailability from './pages/EmployeeAvailability';
 import EmployeeVisits from './pages/EmployeeVisits';
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import {  useState } from "react";
+
+import { AuthContext } from './context/AuthContext';
 // import useAuth from "./components/AuthContext";
 
 function App() {  
   
-  // const { auth } = useAuth();
+  const [currentUser, setCurrentUser] = useState();
+
+  const setAuth = (data) => {
+    if(data) {
+      localStorage.setItem("user", data);
+        setCurrentUser({user: data});
+        console.log('Data in setAuth: ', data);
+    } else { 
+      localStorage.clear();
+      setCurrentUser();
+      console.log("Data is not present!!")
+    }
+
+  }
+
   return (
+    <AuthContext.Provider value={{ currentUser, setCurrentUser: setAuth }}>
       <Router forceRefresh={true}>
         <div className="App">
             <NavigationBar />
@@ -30,6 +48,7 @@ function App() {
             </div>
         </div>
       </Router>
+      </AuthContext.Provider>
   );
 }
 

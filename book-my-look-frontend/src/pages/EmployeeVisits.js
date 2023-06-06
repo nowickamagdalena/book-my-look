@@ -9,10 +9,12 @@ import Form from 'react-bootstrap/Form';
 import Alert from "react-bootstrap/Alert";
 import getLoggedUser from "../context/auth";
 
+//TODO: create visits calendar instead of availabilities calendar
 
-const EmployeeAvailability = () => {
+const EmployeeVisits = () => {
     const loggedInUser = getLoggedUser();
     console.log(loggedInUser);
+
     const [startDate, setStartDate] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0]);
     const [endDate, setEndDate] = useState(endOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0]);
     const [events, setEvents] = useState([]);
@@ -29,14 +31,14 @@ const EmployeeAvailability = () => {
     const [validated, setValidated] = useState(false);
 
     const updateEvents = (start, end) => {
-        axios.get(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities?startDate=${start}&endDate=${end}`, {
+        axios.get(`http://localhost:8080/visits/employee/${loggedInUser.employeeId}?startDate=${start}&endDate=${end}`, {
             headers: {
                 'Authorization': `Bearer ${loggedInUser.id_token}`
             }
         })
             .then(res => {
-                const newEvents = res.data.map(aval => {
-                    return { title: "Available", start: `${aval.date}T${aval.startTime}`, end: `${aval.date}T${aval.endTime}`, availibilityId: aval.id };
+                const newEvents = res.data.map(visit => {
+                    return { title: `${visit.salonServiceName}`, start: `${visit.date}T${visit.startTime}`, end: `${visit.date}T${visit.endTime}`, visitId: visit.id };
                 });
                 setEvents(newEvents);
             }).catch(error => {
@@ -45,6 +47,7 @@ const EmployeeAvailability = () => {
     }
 
     useEffect(() => {
+        console.log(startDate + " and " + endDate);
         updateEvents(startDate, endDate);
     }, []);
 
@@ -127,11 +130,7 @@ const EmployeeAvailability = () => {
     };
 
     const handleDelete = () => {
-        axios.delete(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${currentAvalId}`, {
-            headers: {
-                'Authorization': `Bearer ${loggedInUser.id_token}`
-            }
-        })
+        axios.delete(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${currentAvalId}`)
             .then(response => {
                 console.log(response);
                 setCurrentAvalId("");
@@ -177,7 +176,7 @@ const EmployeeAvailability = () => {
 
     return (
         <div className="book-visit">
-            <h2>My availability</h2>
+            <h2>My visits</h2>
             <Modal
                 show={show}
                 onHide={handleClose}
@@ -270,4 +269,4 @@ function renderEventContent(eventInfo) {
 }
 
 
-export default EmployeeAvailability;
+export default EmployeeVisits;
