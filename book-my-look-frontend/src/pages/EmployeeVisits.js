@@ -13,10 +13,10 @@ import getLoggedUser from "../context/auth";
 
 const EmployeeVisits = () => {
     const loggedInUser = getLoggedUser();
-    console.log(loggedInUser);
-
-    const [startDate, setStartDate] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0]);
-    const [endDate, setEndDate] = useState(endOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0]);
+    // console.log(loggedInUser);
+    const [dateRange, setDateRange] = useState(
+        { start: startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0], end: endOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0] }
+    )
     const [events, setEvents] = useState([]);
 
     const [show, setShow] = useState(false);
@@ -24,21 +24,33 @@ const EmployeeVisits = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
 
-    const [currentAvalId, setCurrentAvalId] = useState('');
-    const [formDate, setFormDate] = useState('');
-    const [formStartTime, setFormStartTime] = useState('');
-    const [formEndTime, setFormEndTime] = useState('');
-    const [validated, setValidated] = useState(false);
+    const [visitData, setVisitData] = useState(
+        {
+            visitId: '',
+            service: '',
+            day: '',
+            startTime: '',
+            endTime: '',
+            clientInfo: {}
+            // validated: false
+        }
+    )
 
-    const updateEvents = (start, end) => {
-        axios.get(`http://localhost:8080/visits/employee/${loggedInUser.employeeId}?startDate=${start}&endDate=${end}`, {
+    const updateEvents = (dateRange) => {
+        axios.get(`http://localhost:8080/visits/employee/${loggedInUser.employeeId}?startDate=${dateRange.start}&endDate=${dateRange.end}`, {
             headers: {
                 'Authorization': `Bearer ${loggedInUser.id_token}`
             }
         })
             .then(res => {
                 const newEvents = res.data.map(visit => {
-                    return { title: `${visit.salonServiceName}`, start: `${visit.date}T${visit.startTime}`, end: `${visit.date}T${visit.endTime}`, visitId: visit.id };
+                    return {
+                        title: visit.salonServiceName,
+                        start: `${visit.date}T${visit.startTime}`,
+                        end: `${visit.date}T${visit.endTime}`,
+                        visitId: visit.id,
+                        clientInfo: visit.client
+                    };
                 });
                 setEvents(newEvents);
             }).catch(error => {
@@ -47,95 +59,110 @@ const EmployeeVisits = () => {
     }
 
     useEffect(() => {
-        console.log(startDate + " and " + endDate);
-        updateEvents(startDate, endDate);
-    }, []);
+        updateEvents(dateRange);
+    }, [dateRange]);
 
     const handleShow = () => setShow(true);
-    const handleClose = () => {
-        setShow(false);
-        setShowMessage(false);
-        setCurrentAvalId("");
-        setFormDate("");
-        setFormStartTime("");
-        setFormEndTime("");
-        setValidated(false);
-        setShowDelete(false);
+    // const handleClose = () => {
+    //     setShow(false);
+    //     setShowMessage(false);
+    //     resetFormData();
+    //     setShowDelete(false);
+    // }
+
+    const resetVisitData = () => {
+        setVisitData(
+            {
+                visitId: '',
+                service: '',
+                day: '',
+                startTime: '',
+                endTime: '',
+                clientInfo: {}
+            })
     }
 
-    const handleSave = (event) => {
-        const form = event.currentTarget;
-        const startT = formStartTime.split(':').map(s => parseInt(s));
-        const endT = formEndTime.split(':').map(s => parseInt(s));
-        const isTimePeriodInvalid = (startT[0] > endT[0]) || (startT[0] === endT[0] && startT[1] >= endT[1]);
-        if (form.checkValidity() === false || isTimePeriodInvalid) {
-            //TODO: Display this message to user, Also validate only 15 minutes can be chosen maybe change for time picker
-            if (isTimePeriodInvalid) {
-                setErrorMessage("Start time needs to be after end time");
-                setShowMessage(true);
-            }
-            event.preventDefault();
-            event.stopPropagation();
-        } else {
-            event.preventDefault();
+    // const handleSave = (event) => {
+    //     const form = event.currentTarget;
+    //     const startT = formData.startTime.split(':').map(s => parseInt(s));
+    //     const endT = formData.endTime.split(':').map(s => parseInt(s));
+    //     const isTimePeriodInvalid = (startT[0] > endT[0]) || (startT[0] === endT[0] && startT[1] >= endT[1]);
+    //     const isTimeNotDivisibleByFive = startT[1] % 5 !== 0 || endT[1] % 5 !== 0;
+    //     if (form.checkValidity() === false || isTimePeriodInvalid || isTimeNotDivisibleByFive) {
+    //         if (isTimePeriodInvalid) {
+    //             setErrorMessage("Start time needs to be after end time");
+    //             setShowMessage(true);
+    //         }
+    //         if (isTimeNotDivisibleByFive) {
+    //             setErrorMessage("Time must be divisible by 5 minutes");
+    //             setShowMessage(true);
+    //         }
+    //         event.preventDefault();
+    //         event.stopPropagation();
+    //     } else {
+    //         event.preventDefault();
 
-            const eventdata = { date: event.target.date.value, startTime: event.target.startTime.value, endTime: event.target.endTime.value };
+    //         const eventdata = { date: event.target.date.value, startTime: event.target.startTime.value, endTime: event.target.endTime.value };
 
-            if (currentAvalId === "") {
-                axios.post(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities`, eventdata, {
-                    headers: {
-                        'Authorization': `Bearer ${loggedInUser.id_token}`
-                    }
-                })
-                    .then(response => {
-                        console.log(response);
-                        handleClose();
-                        updateEvents(startDate, endDate);
-                    })
-                    .catch(error => {
-                        if (error.response) {
-                            setErrorMessage(error.response.data.message);
-                        } else {
-                            setErrorMessage(error.message);
-                        }
-                        setShowMessage(true);
-                        console.error('There was an error!');
-                    });
+    //         if (formData.currentAvalId === "") {
+    //             axios.post(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities`, eventdata, {
+    //                 headers: {
+    //                     'Authorization': `Bearer ${loggedInUser.id_token}`
+    //                 }
+    //             })
+    //                 .then(response => {
+    //                     console.log(response);
+    //                     handleClose();
+    //                     updateEvents(dateRange);
+    //                 })
+    //                 .catch(error => {
+    //                     if (error.response) {
+    //                         setErrorMessage(error.response.data.message);
+    //                     } else {
+    //                         setErrorMessage(error.message);
+    //                     }
+    //                     setShowMessage(true);
+    //                     console.error('There was an error!');
+    //                 });
 
-            } else {
-                axios.put(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${currentAvalId}`, eventdata, {
-                    headers: {
-                        'Authorization': `Bearer ${loggedInUser.id_token}`
-                    }
-                })
-                    .then(response => {
-                        console.log(response);
-                        handleClose();
-                        updateEvents(startDate, endDate);
-                    })
-                    .catch(error => {
-                        if (error.response) {
-                            setErrorMessage(error.response.data.message);
-                        } else {
-                            setErrorMessage(error.message);
-                        }
-                        setShowMessage(true);
-                        console.error('There was an error!');
-                    });
+    //         } else {
+    //             axios.put(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${formData.currentAvalId}`, eventdata, {
+    //                 headers: {
+    //                     'Authorization': `Bearer ${loggedInUser.id_token}`
+    //                 }
+    //             })
+    //                 .then(response => {
+    //                     console.log(response);
+    //                     handleClose();
+    //                     updateEvents(dateRange);
+    //                 })
+    //                 .catch(error => {
+    //                     if (error.response) {
+    //                         setErrorMessage(error.response.data.message);
+    //                     } else {
+    //                         setErrorMessage(error.message);
+    //                     }
+    //                     setShowMessage(true);
+    //                     console.error('There was an error!');
+    //                 });
 
-            }
+    //         }
 
-        }
-        setValidated(true);
-    };
+    //     }
+    //     setFormData({ ...formData, validated: true });
+    // };
 
     const handleDelete = () => {
-        axios.delete(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${currentAvalId}`)
+        axios.delete(`http://localhost:8080/visits/${visitData.visitId}`, {
+            headers: {
+                'Authorization': `Bearer ${loggedInUser.id_token}`
+            }
+        })
             .then(response => {
                 console.log(response);
-                setCurrentAvalId("");
-                handleClose();
-                updateEvents(startDate, endDate);
+                resetVisitData();
+                // handleClose();
+                updateEvents(dateRange);
             })
             .catch(error => {
                 if (error.response) {
@@ -149,15 +176,22 @@ const EmployeeVisits = () => {
     }
 
     function handleEventClick(eventInfo) {
-        const availabilityId = eventInfo.event._def.extendedProps.availibilityId;
-        console.log("Event has been clicked", eventInfo.event._instance.range);
-        setCurrentAvalId(availabilityId);
+        const eventExtendedProps = eventInfo.event._def.extendedProps
+        const visitId = eventExtendedProps.visitId;
+        const clientInfo = eventExtendedProps.clientInfo;
+        console.log("Event has been clicked", eventInfo);
         var start = new Date(eventInfo.event._instance.range.start);
         var end = new Date(eventInfo.event._instance.range.end);
-        setFormDate(start.toISOString().split('T')[0]);
-        setFormStartTime(start.toISOString().substring(11, 16));
-        setFormEndTime(end.toISOString().substring(11, 16));
-        setCurrentAvalId(availabilityId);
+        setVisitData(
+            {
+                visitId: visitId,
+                service: eventInfo.event._def.title,
+                day: start.toISOString().split('T')[0],
+                startTime: start.toISOString().substring(11, 16),
+                endTime: end.toISOString().substring(11, 16),
+                clientInfo: clientInfo
+                // validated: ''
+            })
         setShowDelete(true);
         setShow(true);
     }
@@ -168,16 +202,14 @@ const EmployeeVisits = () => {
         console.log(dateInfo.startStr.split('T')[0]);
         var start = dateInfo.startStr.split('T')[0];
         var end = dateInfo.endStr.split('T')[0];
-        setStartDate(start);
-        setEndDate(end);
-        updateEvents(start, end);
+        setDateRange({ start: start, end: end })
 
     }
 
     return (
         <div className="book-visit">
             <h2>My visits</h2>
-            <Modal
+            {/* <Modal
                 show={show}
                 onHide={handleClose}
                 backdrop="static"
@@ -186,20 +218,20 @@ const EmployeeVisits = () => {
                 centered
             >
                 <Modal.Header closeButton>
-                    {currentAvalId === "" && <Modal.Title> Add new availability</Modal.Title>}
-                    {currentAvalId !== "" && <Modal.Title> Edit availability</Modal.Title>}
+                    {formData.currentAvalId === "" && <Modal.Title> Add new availability</Modal.Title>}
+                    {formData.currentAvalId !== "" && <Modal.Title> Edit availability</Modal.Title>}
                 </Modal.Header>
                 <Modal.Body>
                     <Alert show={showMessage} variant="danger">
                         Something went wrong! {errorMessage}
                     </Alert>
                     {showDelete && <div className="delete-button-div"><Button variant="danger" className="float-end" onClick={handleDelete}>Delete</Button></div>}
-                    <Form noValidate validated={validated} onSubmit={handleSave}>
+                    <Form noValidate validated={formData.validated} onSubmit={handleSave}>
                         <Form.Group className="mb-3" controlId="modalDayControl">
                             <Form.Label>Enter day</Form.Label>
                             <Form.Control required type="date" name="date" autoFocus
-                                value={formDate}
-                                onChange={e => setFormDate(e.target.value)} />
+                                value={formData.day}
+                                onChange={e => setFormData({ ...formData, day: e.target.value })} />
                             <Form.Control.Feedback type="invalid">
                                 Please provide a date.
                             </Form.Control.Feedback>
@@ -207,8 +239,8 @@ const EmployeeVisits = () => {
                         <Form.Group className="mb-3" controlId="modalStartTimeControl">
                             <Form.Label>Enter start time</Form.Label>
                             <Form.Control required type="time" name="startTime"
-                                value={formStartTime}
-                                onChange={e => setFormStartTime(e.target.value)} />
+                                value={formData.startTime}
+                                onChange={e => setFormData({ ...formData, startTime: e.target.value })} />
                             <Form.Control.Feedback type="invalid">
                                 Please provide a start time.
                             </Form.Control.Feedback>
@@ -216,8 +248,8 @@ const EmployeeVisits = () => {
                         <Form.Group className="mb-3" controlId="modalEndTimeControl">
                             <Form.Label>Enter end time</Form.Label>
                             <Form.Control required type="time" name="endTime"
-                                value={formEndTime}
-                                onChange={e => setFormEndTime(e.target.value)} />
+                                value={formData.endTime}
+                                onChange={e => setFormData({ ...formData, endTime: e.target.value })} />
                             <Form.Control.Feedback type="invalid">
                                 Please provide an end time.
                             </Form.Control.Feedback>
@@ -234,7 +266,8 @@ const EmployeeVisits = () => {
                 <Button variant="pink" onClick={handleShow}>
                     Add availability
                 </Button>
-            </div>
+            </div> */}
+            <div className="visitCalendar">
             <FullCalendar
                 plugins={[timeGridPlugin]}
                 initialView='timeGridWeek'
@@ -255,6 +288,72 @@ const EmployeeVisits = () => {
                 eventClick={handleEventClick}
                 datesSet={handleDatesSet}
             />
+            <div className="visitDetails">
+            <Form noValidate >
+                        <p>Visit</p>
+                        <Form.Group className="mb-3" controlId="modalDayControl">
+                            <Form.Label>Service</Form.Label>
+                            <Form.Control required type="text" name="service" autoFocus
+                                value={visitData.service}
+                                onChange={e => setVisitData({ ...visitData, service: e.target.value })} />
+                            <Form.Control.Feedback type="invalid">
+                                Please provide a date.
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="modalDayControl">
+                            <Form.Label>Enter day</Form.Label>
+                            <Form.Control required type="date" name="date" autoFocus
+                                value={visitData.day}
+                                onChange={e => setVisitData({ ...visitData, day: e.target.value })} />
+                            <Form.Control.Feedback type="invalid">
+                                Please provide a date.
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="modalStartTimeControl">
+                            <Form.Label>Enter start time</Form.Label>
+                            <Form.Control required type="time" name="startTime"
+                                value={visitData.startTime}
+                                onChange={e => setVisitData({ ...visitData, startTime: e.target.value })} />
+                            <Form.Control.Feedback type="invalid">
+                                Please provide a start time.
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="modalEndTimeControl">
+                            <Form.Label>Enter end time</Form.Label>
+                            <Form.Control required type="time" name="endTime"
+                                value={visitData.endTime}
+                                onChange={e => setVisitData({ ...visitData, endTime: e.target.value })} />
+                            <Form.Control.Feedback type="invalid">
+                                Please provide an end time.
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                        <div>
+                            <p>Client</p>
+                        <Form.Group className="mb-3" controlId="modalDayControl">
+                            <Form.Label>First name</Form.Label>
+                            <Form.Control required type="text" name="service" autoFocus
+                                value={visitData.clientInfo.firstName}
+                                onChange={e => setVisitData({ ...visitData.clientInfo, firstName: e.target.value })} />
+                            <Form.Control.Feedback type="invalid">
+                                Please provide a date.
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="modalDayControl">
+                            <Form.Label>Last name</Form.Label>
+                            <Form.Control required type="text" name="service" autoFocus
+                                value={visitData.clientInfo.lastName}
+                                onChange={e => setVisitData({ ...visitData.clientInfo, lastName: e.target.value })} />
+                            <Form.Control.Feedback type="invalid">
+                                Please provide a date.
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                        </div>
+                        <div className="col-md-12 text-center">
+                            <Button type="submit" variant="pink">Save</Button>
+                        </div>
+                    </Form>
+            </div>
+            </div>
         </div>
     );
 }
