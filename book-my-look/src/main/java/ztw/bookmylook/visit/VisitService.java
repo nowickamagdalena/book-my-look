@@ -54,7 +54,7 @@ public class VisitService {
 
         return visitRepository.findAllByEmployeeIdAndDateBetween(employeeId, startDate, endDate).stream()
                 .map(v -> new VisitDto(
-                        v.getId(), v.getDate(), v.getStartTime(), v.getEndTime(), v.getSalonService().getName(),
+                        v.getId(), v.getDate(), v.getStartTime(), v.getEndTime(), v.getSalonService(),
                         clientService.mapClientToDto(v.getClient()))
                 )
                 .toList();

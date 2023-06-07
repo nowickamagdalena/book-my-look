@@ -48,8 +48,14 @@ body {
 }
 
 .visit-details {
-    padding-left: 20px;
+    padding-left: 30px;
     width: 30%;
+    display: flex;
+    flex-direction: column;
+}
+
+.visit-details .btn-close {
+    margin-bottom: 20px;
 }
 
 .form-times {
@@ -63,8 +69,25 @@ body {
     flex-direction: row;
     justify-content: space-between;
 }
+.visit-header button{
+    margin-left: 10px;
+}
 
 .display-row {
     display: flex;
     flex-direction: row;
+}
+
+fieldset {
+    padding: 10px!important;
+    margin: 10px 0 !important;
+    background-color: #7d4875;
+}
+
+fieldset label, legend{
+    color: white;
+}
+
+fieldset input{
+    color: #7d4875 !important;
 }
