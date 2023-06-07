@@ -12,9 +12,10 @@ import getLoggedUser from "../context/auth";
 
 const EmployeeAvailability = () => {
     const loggedInUser = getLoggedUser();
-    console.log(loggedInUser);
-    const [startDate, setStartDate] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0]);
-    const [endDate, setEndDate] = useState(endOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0]);
+    // console.log(loggedInUser);
+    const [dateRange, setDateRange] = useState(
+        { start: startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0], end: endOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0] }
+        )
     const [events, setEvents] = useState([]);
 
     const [show, setShow] = useState(false);
@@ -22,14 +23,18 @@ const EmployeeAvailability = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
 
-    const [currentAvalId, setCurrentAvalId] = useState('');
-    const [formDate, setFormDate] = useState('');
-    const [formStartTime, setFormStartTime] = useState('');
-    const [formEndTime, setFormEndTime] = useState('');
-    const [validated, setValidated] = useState(false);
+    const [formData, setFormData] = useState(
+        {
+            currentAvalId: '',
+            day: '',
+            startTime: '',
+            endTime: '',
+            validated: false
+        }
+    )
 
-    const updateEvents = (start, end) => {
-        axios.get(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities?startDate=${start}&endDate=${end}`, {
+    const updateEvents = (dateRange) => {
+        axios.get(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities?startDate=${dateRange.start}&endDate=${dateRange.end}`, {
             headers: {
                 'Authorization': `Bearer ${loggedInUser.id_token}`
             }
@@ -45,30 +50,41 @@ const EmployeeAvailability = () => {
     }
 
     useEffect(() => {
-        updateEvents(startDate, endDate);
-    }, []);
+        updateEvents(dateRange);
+    }, [dateRange]);
 
     const handleShow = () => setShow(true);
     const handleClose = () => {
         setShow(false);
         setShowMessage(false);
-        setCurrentAvalId("");
-        setFormDate("");
-        setFormStartTime("");
-        setFormEndTime("");
-        setValidated(false);
+        resetFormData();
         setShowDelete(false);
+    }
+
+    const resetFormData = () => {
+        setFormData(
+            {
+                currentAvalId: '',
+                day: '',
+                startTime: '',
+                endTime: '',
+                validated: false
+            })
     }
 
     const handleSave = (event) => {
         const form = event.currentTarget;
-        const startT = formStartTime.split(':').map(s => parseInt(s));
-        const endT = formEndTime.split(':').map(s => parseInt(s));
+        const startT = formData.startTime.split(':').map(s => parseInt(s));
+        const endT = formData.endTime.split(':').map(s => parseInt(s));
         const isTimePeriodInvalid = (startT[0] > endT[0]) || (startT[0] === endT[0] && startT[1] >= endT[1]);
-        if (form.checkValidity() === false || isTimePeriodInvalid) {
-            //TODO: Display this message to user, Also validate only 15 minutes can be chosen maybe change for time picker
+        const isTimeNotDivisibleByFive = startT[1] % 5 !== 0 || endT[1] % 5 !== 0;
+        if (form.checkValidity() === false || isTimePeriodInvalid || isTimeNotDivisibleByFive) {
             if (isTimePeriodInvalid) {
                 setErrorMessage("Start time needs to be after end time");
+                setShowMessage(true);
+            }
+            if (isTimeNotDivisibleByFive) {
+                setErrorMessage("Time must be divisible by 5 minutes");
                 setShowMessage(true);
             }
             event.preventDefault();
@@ -78,7 +94,7 @@ const EmployeeAvailability = () => {
 
             const eventdata = { date: event.target.date.value, startTime: event.target.startTime.value, endTime: event.target.endTime.value };
 
-            if (currentAvalId === "") {
+            if (formData.currentAvalId === "") {
                 axios.post(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities`, eventdata, {
                     headers: {
                         'Authorization': `Bearer ${loggedInUser.id_token}`
@@ -87,7 +103,7 @@ const EmployeeAvailability = () => {
                     .then(response => {
                         console.log(response);
                         handleClose();
-                        updateEvents(startDate, endDate);
+                        updateEvents(dateRange);
                     })
                     .catch(error => {
                         if (error.response) {
@@ -100,7 +116,7 @@ const EmployeeAvailability = () => {
                     });
 
             } else {
-                axios.put(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${currentAvalId}`, eventdata, {
+                axios.put(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${formData.currentAvalId}`, eventdata, {
                     headers: {
                         'Authorization': `Bearer ${loggedInUser.id_token}`
                     }
@@ -108,7 +124,7 @@ const EmployeeAvailability = () => {
                     .then(response => {
                         console.log(response);
                         handleClose();
-                        updateEvents(startDate, endDate);
+                        updateEvents(dateRange);
                     })
                     .catch(error => {
                         if (error.response) {
@@ -123,20 +139,20 @@ const EmployeeAvailability = () => {
             }
 
         }
-        setValidated(true);
+        setFormData({...formData, validated: true});
     };
 
     const handleDelete = () => {
-        axios.delete(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${currentAvalId}`, {
+        axios.delete(`http://localhost:8080/employees/${loggedInUser.employeeId}/availabilities/${formData.currentAvalId}`, {
             headers: {
                 'Authorization': `Bearer ${loggedInUser.id_token}`
             }
         })
             .then(response => {
                 console.log(response);
-                setCurrentAvalId("");
+                setFormData({...formData, currentAvalId: ''});
                 handleClose();
-                updateEvents(startDate, endDate);
+                updateEvents(dateRange);
             })
             .catch(error => {
                 if (error.response) {
@@ -152,13 +168,16 @@ const EmployeeAvailability = () => {
     function handleEventClick(eventInfo) {
         const availabilityId = eventInfo.event._def.extendedProps.availibilityId;
         console.log("Event has been clicked", eventInfo.event._instance.range);
-        setCurrentAvalId(availabilityId);
         var start = new Date(eventInfo.event._instance.range.start);
         var end = new Date(eventInfo.event._instance.range.end);
-        setFormDate(start.toISOString().split('T')[0]);
-        setFormStartTime(start.toISOString().substring(11, 16));
-        setFormEndTime(end.toISOString().substring(11, 16));
-        setCurrentAvalId(availabilityId);
+        setFormData(
+            {
+                currentAvalId: availabilityId,
+                day: start.toISOString().split('T')[0],
+                startTime: start.toISOString().substring(11, 16),
+                endTime: end.toISOString().substring(11, 16),
+                validated: ''
+            })
         setShowDelete(true);
         setShow(true);
     }
@@ -169,9 +188,7 @@ const EmployeeAvailability = () => {
         console.log(dateInfo.startStr.split('T')[0]);
         var start = dateInfo.startStr.split('T')[0];
         var end = dateInfo.endStr.split('T')[0];
-        setStartDate(start);
-        setEndDate(end);
-        updateEvents(start, end);
+        setDateRange({ start: start, end: end })
 
     }
 
@@ -187,20 +204,20 @@ const EmployeeAvailability = () => {
                 centered
             >
                 <Modal.Header closeButton>
-                    {currentAvalId === "" && <Modal.Title> Add new availability</Modal.Title>}
-                    {currentAvalId !== "" && <Modal.Title> Edit availability</Modal.Title>}
+                    {formData.currentAvalId === "" && <Modal.Title> Add new availability</Modal.Title>}
+                    {formData.currentAvalId !== "" && <Modal.Title> Edit availability</Modal.Title>}
                 </Modal.Header>
                 <Modal.Body>
                     <Alert show={showMessage} variant="danger">
                         Something went wrong! {errorMessage}
                     </Alert>
                     {showDelete && <div className="delete-button-div"><Button variant="danger" className="float-end" onClick={handleDelete}>Delete</Button></div>}
-                    <Form noValidate validated={validated} onSubmit={handleSave}>
+                    <Form noValidate validated={formData.validated} onSubmit={handleSave}>
                         <Form.Group className="mb-3" controlId="modalDayControl">
                             <Form.Label>Enter day</Form.Label>
                             <Form.Control required type="date" name="date" autoFocus
-                                value={formDate}
-                                onChange={e => setFormDate(e.target.value)} />
+                                value={formData.day}
+                                onChange={e => setFormData({...formData, day: e.target.value})} />
                             <Form.Control.Feedback type="invalid">
                                 Please provide a date.
                             </Form.Control.Feedback>
@@ -208,8 +225,8 @@ const EmployeeAvailability = () => {
                         <Form.Group className="mb-3" controlId="modalStartTimeControl">
                             <Form.Label>Enter start time</Form.Label>
                             <Form.Control required type="time" name="startTime"
-                                value={formStartTime}
-                                onChange={e => setFormStartTime(e.target.value)} />
+                                value={formData.startTime}
+                                onChange={e => setFormData({...formData, startTime: e.target.value})} />
                             <Form.Control.Feedback type="invalid">
                                 Please provide a start time.
                             </Form.Control.Feedback>
@@ -217,8 +234,8 @@ const EmployeeAvailability = () => {
                         <Form.Group className="mb-3" controlId="modalEndTimeControl">
                             <Form.Label>Enter end time</Form.Label>
                             <Form.Control required type="time" name="endTime"
-                                value={formEndTime}
-                                onChange={e => setFormEndTime(e.target.value)} />
+                                value={formData.endTime}
+                                onChange={e => setFormData({...formData, endTime: e.target.value})} />
                             <Form.Control.Feedback type="invalid">
                                 Please provide an end time.
                             </Form.Control.Feedback>

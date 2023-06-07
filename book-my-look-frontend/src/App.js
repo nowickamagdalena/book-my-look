@@ -21,7 +21,7 @@ function App() {
     if(data) {
       localStorage.setItem("user", data);
         setCurrentUser({user: data});
-        console.log('Data in setAuth: ', data);
+        // console.log('Data in setAuth: ', data);
     } else { 
       localStorage.clear();
       setCurrentUser();

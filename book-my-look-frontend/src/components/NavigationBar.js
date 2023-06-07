@@ -10,7 +10,7 @@ import getLoggedUser from '../context/auth';
 function NavigationBar() {
     // const { user } = useAuth();
     const user = getLoggedUser();
-    console.log("user:" + user);
+    // console.log("user:" + user);
 
     function loggedInNav() {
         return (
