@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import jwt_decode from "jwt-decode";
 import axios from 'axios';
-import getLoggedUser from "../auth/auth";
+import getLoggedUser from "../context/auth";
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
 
 const EmployeeLogin = () => {
     const [user, setUser] = useState({});
+    const { setCurrentUser } = useAuth();
     const navigate = useNavigate();
-        const loggedInUser = getLoggedUser();
+    const loggedInUser = getLoggedUser();
 
     useEffect(() => {
         /* global google */
@@ -26,7 +28,7 @@ const EmployeeLogin = () => {
           setUser(loggedInUser);
           document.getElementById("signInDiv").hidden = false;
         }
-    }, []);
+    }, [setCurrentUser]);
 
     function handleCallbackResponse(response) {
         console.log("Encoded JWT ID token: " + response.credential);
@@ -43,9 +45,8 @@ const EmployeeLogin = () => {
                 const userObject = { employeeId: userData.id, firstName: userData.firstName, lastName: userData.lastName, email: userData.email, id_token: id_token };
                 document.getElementById("signInDiv").hidden = true;
                 setUser(userObject);
-                localStorage.setItem("user", JSON.stringify(userObject));
+                setCurrentUser(JSON.stringify(userObject));
                 navigate("/availability");
-                navigate(0);
             })
             .catch((error) => {
                 //TODO: display error to user
@@ -55,11 +56,12 @@ const EmployeeLogin = () => {
     }
 
     function handleSignOut(response) {
-        setUser({});
-        localStorage.clear();
         document.getElementById("signInDiv").hidden = false;
+        setUser(null);
+        setCurrentUser();
         navigate("/");
         navigate(0);
+        // TODO: fix this refreshing so the navbar will update like during sign in
     }
 
 
