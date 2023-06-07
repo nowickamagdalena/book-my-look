@@ -23,6 +23,7 @@ const EmployeeVisits = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [showMessage, setShowMessage] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
+    const [showVisitDetails, setShowVisitDetails] = useState(false);
 
     const [visitData, setVisitData] = useState(
         {
@@ -193,6 +194,8 @@ const EmployeeVisits = () => {
                 // validated: ''
             })
         setShowDelete(true);
+        document.getElementById('calendar').className = "w-75";
+        setShowVisitDetails(true);
         setShow(true);
     }
 
@@ -206,9 +209,14 @@ const EmployeeVisits = () => {
 
     }
 
+    function handleEdit(event) {
+        console.log("MAke fields editable", event);
+
+    }
+
     return (
         <div className="book-visit">
-            <h2>My visits</h2>
+            <h1>My visits</h1>
             {/* <Modal
                 show={show}
                 onHide={handleClose}
@@ -267,33 +275,45 @@ const EmployeeVisits = () => {
                     Add availability
                 </Button>
             </div> */}
-            <div className="visitCalendar">
-            <FullCalendar
-                plugins={[timeGridPlugin]}
-                initialView='timeGridWeek'
-                firstDay="1"
-                weekends={true}
-                slotEventOverlap={false}
-                allDaySlot={false}
-                slotMinTime="08:00:00"
-                slotMaxTime="20:00:00"
-                slotDuration="00:15:00"
-                slotLabelInterval="00:30"
-                events={events}
-                eventDisplay="block"
-                displayEventEnd={true}
-                eventBackgroundColor="#c771b9"
-                eventBorderColor="#7d4875"
-                eventContent={renderEventContent}
-                eventClick={handleEventClick}
-                datesSet={handleDatesSet}
-            />
-            <div className="visitDetails">
-            <Form noValidate >
-                        <p>Visit</p>
+            <div className="visit-calendar">
+                <div className="w-100" id="calendar">
+                    <FullCalendar
+                        plugins={[timeGridPlugin]}
+                        initialView='timeGridWeek'
+                        firstDay="1"
+                        weekends={true}
+                        slotEventOverlap={false}
+                        allDaySlot={false}
+                        slotMinTime="08:00:00"
+                        slotMaxTime="20:00:00"
+                        slotDuration="00:15:00"
+                        slotLabelInterval="00:30"
+                        events={events}
+                        eventDisplay="block"
+                        displayEventEnd={true}
+                        eventBackgroundColor="#c771b9"
+                        eventBorderColor="#7d4875"
+                        eventContent={renderEventContent}
+                        eventClick={handleEventClick}
+                        datesSet={handleDatesSet}
+                    />
+                </div>
+                {showVisitDetails && <div className="visit-details float-end w-25">
+                    <div className="visit-header">
+                        <h2>Visit</h2>
+                        <div className="display-row float-end">
+                            <div className="w-50 text-center">
+                                <Button variant="pink" onClick={handleEdit}>Edit</Button>
+                            </div>
+                            <div className="w-50 text-center">
+                                <Button variant="danger">Delete</Button>
+                            </div>
+                        </div>
+                    </div>
+                    <Form noValidate >
                         <Form.Group className="mb-3" controlId="modalDayControl">
                             <Form.Label>Service</Form.Label>
-                            <Form.Control required type="text" name="service" autoFocus
+                            <Form.Control required type="text" name="service" autoFocus readOnly
                                 value={visitData.service}
                                 onChange={e => setVisitData({ ...visitData, service: e.target.value })} />
                             <Form.Control.Feedback type="invalid">
@@ -301,58 +321,75 @@ const EmployeeVisits = () => {
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="modalDayControl">
-                            <Form.Label>Enter day</Form.Label>
-                            <Form.Control required type="date" name="date" autoFocus
+                            <Form.Label>Date</Form.Label>
+                            <Form.Control required type="date" name="date" autoFocus readOnly
                                 value={visitData.day}
                                 onChange={e => setVisitData({ ...visitData, day: e.target.value })} />
                             <Form.Control.Feedback type="invalid">
                                 Please provide a date.
                             </Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Group className="mb-3" controlId="modalStartTimeControl">
-                            <Form.Label>Enter start time</Form.Label>
-                            <Form.Control required type="time" name="startTime"
-                                value={visitData.startTime}
-                                onChange={e => setVisitData({ ...visitData, startTime: e.target.value })} />
-                            <Form.Control.Feedback type="invalid">
-                                Please provide a start time.
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group className="mb-3" controlId="modalEndTimeControl">
-                            <Form.Label>Enter end time</Form.Label>
-                            <Form.Control required type="time" name="endTime"
-                                value={visitData.endTime}
-                                onChange={e => setVisitData({ ...visitData, endTime: e.target.value })} />
-                            <Form.Control.Feedback type="invalid">
-                                Please provide an end time.
-                            </Form.Control.Feedback>
-                        </Form.Group>
+                        <div className="form-times">
+                            <Form.Group className="w-50" controlId="modalStartTimeControl">
+                                <Form.Label>Start time</Form.Label>
+                                <Form.Control required type="time" name="startTime" readOnly
+                                    value={visitData.startTime}
+                                    onChange={e => setVisitData({ ...visitData, startTime: e.target.value })} />
+                                <Form.Control.Feedback type="invalid">
+                                    Please provide a start time.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            <Form.Group className="w-50" controlId="modalEndTimeControl">
+                                <Form.Label>End time</Form.Label>
+                                <Form.Control required type="time" name="endTime"
+                                    value={visitData.endTime}
+                                    onChange={e => setVisitData({ ...visitData, endTime: e.target.value })} />
+                                <Form.Control.Feedback type="invalid">
+                                    Please provide an end time.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </div>
                         <div>
                             <p>Client</p>
-                        <Form.Group className="mb-3" controlId="modalDayControl">
-                            <Form.Label>First name</Form.Label>
-                            <Form.Control required type="text" name="service" autoFocus
-                                value={visitData.clientInfo.firstName}
-                                onChange={e => setVisitData({ ...visitData.clientInfo, firstName: e.target.value })} />
-                            <Form.Control.Feedback type="invalid">
-                                Please provide a date.
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group className="mb-3" controlId="modalDayControl">
-                            <Form.Label>Last name</Form.Label>
-                            <Form.Control required type="text" name="service" autoFocus
-                                value={visitData.clientInfo.lastName}
-                                onChange={e => setVisitData({ ...visitData.clientInfo, lastName: e.target.value })} />
-                            <Form.Control.Feedback type="invalid">
-                                Please provide a date.
-                            </Form.Control.Feedback>
-                        </Form.Group>
+                            <Form.Group className="mb-3" controlId="modalDayControl">
+                                <Form.Label>Client name</Form.Label>
+                                <Form.Control required type="text" name="client_name" autoFocus readOnly
+                                    value={visitData.clientInfo.firstName + " " + visitData.clientInfo.lastName} />
+                            </Form.Group>
+                            <Form.Group className="mb-3" controlId="modalDayControl">
+                                <Form.Label>Email</Form.Label>
+                                <Form.Control required type="text" name="service" autoFocus readOnly
+                                    value={visitData.clientInfo.email} />
+                                <Form.Control.Feedback type="invalid">
+                                    Please provide a date.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            <Form.Group className="mb-3" controlId="modalDayControl">
+                                <Form.Label>Phone number</Form.Label>
+                                <Form.Control required type="text" name="service" autoFocus
+                                    value={visitData.clientInfo.phoneNumber}
+                                    onChange={e => setVisitData({ ...visitData.clientInfo, phoneNumber: e.target.value })} />
+                                <Form.Control.Feedback type="invalid">
+                                    Please provide a date.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            <Form.Group className="mb-3" controlId="modalDayControl">
+                                <Form.Label>Additional information</Form.Label>
+                                <Form.Control required type="text" name="service" autoFocus readOnly
+                                    value={visitData.clientInfo.additionalInfo}
+                                    onChange={e => setVisitData({ ...visitData.clientInfo, additionalInfo: e.target.value })} />
+                                <Form.Control.Feedback type="invalid">
+                                    Please provide a date.
+                                </Form.Control.Feedback>
+                            </Form.Group>
                         </div>
                         <div className="col-md-12 text-center">
                             <Button type="submit" variant="pink">Save</Button>
                         </div>
                     </Form>
-            </div>
+
+                </div>
+                }
             </div>
         </div>
     );

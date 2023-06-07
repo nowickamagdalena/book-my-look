@@ -41,3 +41,30 @@ body {
     color: #292b2c  ;
     text-decoration: none;
 }
+
+.visit-calendar {
+    display: flex;
+    flex-direction: row;
+}
+
+.visit-details {
+    padding-left: 20px;
+    width: 30%;
+}
+
+.form-times {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.visit-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.display-row {
+    display: flex;
+    flex-direction: row;
+}
