@@ -1,9 +1,14 @@
-html, body, #app, #app>div {
+html,
+body,
+#app,
+#app>div {
     height: 100%
-  }
-  body > #root > div {
+}
+
+body>#root>div {
     height: 100%;
-  }
+}
+
 body {
     margin: 0;
     padding-top: 60px;
@@ -14,7 +19,7 @@ body {
     padding: 20px;
     display: flex;
     justify-content: center;
-    height: calc(100% - (20px * 2)) ;
+    height: calc(100% - (20px * 2));
 }
 
 .book-visit {
@@ -24,10 +29,12 @@ body {
 .navbar-color {
     background-color: #c771b9;
 }
+
 .btn-pink {
     background-color: #c771b9 !important;
-    color: white  !important;
+    color: white !important;
 }
+
 .book-visit .btn-pink {
     background-color: #7d4875 !important;
     color: white !important;
@@ -38,7 +45,7 @@ body {
 }
 
 .book-visit a {
-    color: #292b2c  ;
+    color: #292b2c;
     text-decoration: none;
 }
 
@@ -69,7 +76,8 @@ body {
     flex-direction: row;
     justify-content: space-between;
 }
-.visit-header button{
+
+.visit-header button {
     margin-left: 10px;
 }
 
@@ -79,15 +87,60 @@ body {
 }
 
 fieldset {
-    padding: 10px!important;
+    padding: 10px !important;
     margin: 10px 0 !important;
     background-color: #7d4875;
 }
 
-fieldset label, legend{
+fieldset label,
+legend {
     color: white;
 }
 
-fieldset input{
+fieldset input {
     color: #7d4875 !important;
+}
+
+.page {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+}
+
+.employee-login {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.employee-login .alert {
+    margin: 30px;
+}
+
+.employee-panel-container {
+    border: 1px solid black;
+    padding: 40px;
+    width: 60%;
+    margin-top: 50px;
+    background-color: #dfb9d9;
+}
+.employee-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    background-color: #dfb9d9;
+    align-items: center;
+}
+
+#sign-in-div {
+    text-align: center;
+    width: 250px;
+}
+
+#sign-out-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
 }
