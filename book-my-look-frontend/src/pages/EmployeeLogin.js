@@ -7,8 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
 import Alert from "react-bootstrap/Alert";
 import Form from 'react-bootstrap/Form';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 
 const EmployeeLogin = () => {
     const [user, setUser] = useState({});
