@@ -145,10 +145,6 @@ fieldset input {
     justify-content: right;
 }
 
-/* #search-button {
-    margin-top: 30px;
-} */
-
 .large-pink-button {
     margin: 20px;
     width: 200px !important;
@@ -165,5 +161,17 @@ fieldset input {
 .registration-div .col {    
     padding-top: 40px;
 }
+
+.visit-detail {
+    display: flex;
+    flex-direction: row;
+    max-width: 300px;
+}
+
+.detail-label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
 
 

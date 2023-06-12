@@ -7,6 +7,7 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
+import RegistrationForm from "../components/RegistrationForm";
 
 const BookVisit = () => {
     const [criteria, setCriteria] = useState({ service: "", employee: "" });
@@ -75,10 +76,8 @@ const BookVisit = () => {
             setPickedSlot(null)
         };
 
-        // Find all elements with class "fc-event"
         const fcEventElements = document.querySelectorAll('.fc-event');
 
-        // Add onBlur event handler to each element
         fcEventElements.forEach((element) => {
             element.addEventListener('blur', handleFocusOut);
         });
@@ -204,7 +203,11 @@ const BookVisit = () => {
             <div className="centered-div">
                 <Button className="large-pink-button" variant="pink" disabled={pickedSlot == null} onClick={displayClientForm}>Book visit</Button>
             </div>
-            
+            <RegistrationForm 
+                slot={pickedSlot}
+                service={criteria.service}
+                employee={criteria.employee}
+            />
         </div>
     );
 }
