@@ -144,3 +144,43 @@ fieldset input {
     flex-direction: row;
     justify-content: right;
 }
+
+.contact-page {
+    padding: 20px;
+}
+
+.color-container {
+    background-color: #dfb9d9;
+    box-shadow: 0 0 20px rgba(66, 68, 90, 0.5);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.contact-page .btn-pink {
+    margin-top: 20px;
+    float: right;
+    border-color: #c771b9;
+    font-size: 16px;
+    padding: 10px 30px;
+}
+
+.contact-page .btn-pink:hover {
+    background-color: #7d4875;
+    border-color: #7d4875;
+}
+
+
+
