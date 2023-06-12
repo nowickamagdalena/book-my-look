@@ -32,19 +32,20 @@ const Contact = () => {
 
     const sendEmail = async () => {
         const templateParams = {
-            to_email: 'ztw.zuzia@gmail.com',
+            to_email: process.env.REACT_APP_ORG_EMAIL,
             from_name: document.getElementById('name').value,
             from_email: document.getElementById('email').value,
+            reply_to: document.getElementById('email').value,
             subject: document.getElementById('subject').value,
             message: document.getElementById('message').value,
         };
 
         try {
             await emailjs.send(
-                'service_tir36tu',
-                'template_yhofphd',
+                process.env.REACT_APP_SERVICE_ID,
+                process.env.REACT_APP_TEMPLATE_ID,
                 templateParams,
-                'FhpTsQ2PeUUdWdh90'
+                process.env.REACT_APP_USER_ID
             );
             console.log('Email sent');
         } catch (error) {
