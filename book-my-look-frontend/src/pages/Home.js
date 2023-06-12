@@ -1,4 +1,3 @@
-import { useSpring, animated } from 'react-spring';
 import heroImage from '../images/hero-image.jpg';
 import service1 from '../images/service-1.jpg';
 import service2 from '../images/service-2.jpg';
@@ -7,14 +6,8 @@ import service4 from '../images/service-4.jpg';
 import { Link } from 'react-router-dom';
 
 const Home = () => {
-    const fadeAnimation = useSpring({
-        opacity: 1,
-        from: { opacity: 0 },
-        config: { duration: 500 }
-    });
-
     return (
-        <animated.div className="home" style={fadeAnimation}>
+        <div className="home">
             <div className="hero">
                 <img src={heroImage} alt="Beauty Salon" />
                 <div className="hero-content">
@@ -75,7 +68,7 @@ const Home = () => {
                     </div>
                 </div>
             </section>
-        </animated.div>
+        </div>
     );
 };
 

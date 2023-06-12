@@ -294,4 +294,38 @@ textarea {
     border-color: #c771b9;
 }
 
+.employee-card{
+    box-shadow: 0 0 20px rgba(199, 113, 185, 0.5);
+    transition: transform 0.3s ease-in-out;
+}
 
+.employee-card .image-container {
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.employee-card .image-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.employees-section {
+    margin-top: 40px;
+    text-align: center;
+    width: 50%;
+}
+
+.employees-section h2 {
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.employee-buttons .btn-pink {
+    background-color: #c771b9 !important;
+    color: white !important;
+    margin-right: 10px;
+    border-color: #c771b9;
+}
