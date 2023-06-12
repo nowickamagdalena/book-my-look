@@ -144,3 +144,26 @@ fieldset input {
     flex-direction: row;
     justify-content: right;
 }
+
+/* #search-button {
+    margin-top: 30px;
+} */
+
+.large-pink-button {
+    margin: 20px;
+    width: 200px !important;
+}
+
+.centered-div {
+    display: flex;
+    justify-content: center;
+}
+
+.registration-div {
+    margin-top: 40px;
+}
+.registration-div .col {    
+    padding-top: 40px;
+}
+
+
