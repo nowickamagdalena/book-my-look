@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import axios from 'axios';
 import {Link} from "react-router-dom";
+import defaultImage from '../images/employee-default.jpg';
 
 const OurTeam = () => {
     const [teamMembers, setTeamMembers] = useState([]);
@@ -28,6 +29,9 @@ const OurTeam = () => {
                         <Card.Img
                             variant="top"
                             src={`/images/employees/employee-${member.id}.jpg`}
+                            onError={(e) => {
+                                e.target.src = defaultImage;
+                            }}
                             alt={member.id}
                         />
                     </div>
@@ -37,7 +41,7 @@ const OurTeam = () => {
                             <Link to="/book-visit">
                                 <button className="btn-pink">Book Visit</button>
                             </Link>
-                            <Link to="/employee">
+                            <Link to="/employee-profile">
                                 <button className="btn-pink">See Profile</button>
                             </Link>
                         </div>

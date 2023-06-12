@@ -249,8 +249,8 @@ textarea {
 
 .services-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
     justify-items: center;
 }
 
@@ -260,7 +260,7 @@ textarea {
     border-radius: 4px;
     text-align: center;
     margin-bottom: 60px;
-    width: 80%;
+    width: 100%;
     box-shadow: 0 0 20px rgba(199, 113, 185, 0.5);
     transition: transform 0.3s ease-in-out;
 }

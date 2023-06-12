@@ -3,6 +3,8 @@ import service1 from '../images/service-1.jpg';
 import service2 from '../images/service-2.jpg';
 import service3 from '../images/service-3.jpg';
 import service4 from '../images/service-4.jpg';
+import service5 from '../images/service-5.jpg';
+import service6 from '../images/service-6.jpg';
 import { Link } from 'react-router-dom';
 
 const Home = () => {
@@ -57,6 +59,30 @@ const Home = () => {
                     <div className="service">
                         <img src={service4} alt="Henna" />
                         <h3>Henna</h3>
+                        <div className="service-buttons">
+                            <Link to="/book-visit">
+                                <button className="btn-pink">Book Visit</button>
+                            </Link>
+                            <Link to="/full-offer">
+                                <button className="btn-pink">See Full Offer</button>
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="service">
+                        <img src={service5} alt="Manicure" />
+                        <h3>Manicure</h3>
+                        <div className="service-buttons">
+                            <Link to="/book-visit">
+                                <button className="btn-pink">Book Visit</button>
+                            </Link>
+                            <Link to="/full-offer">
+                                <button className="btn-pink">See Full Offer</button>
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="service">
+                        <img src={service6} alt="Botox" />
+                        <h3>Botox</h3>
                         <div className="service-buttons">
                             <Link to="/book-visit">
                                 <button className="btn-pink">Book Visit</button>
