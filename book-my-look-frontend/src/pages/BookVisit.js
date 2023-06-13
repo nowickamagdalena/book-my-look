@@ -8,6 +8,7 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
 import RegistrationForm from "../components/RegistrationForm";
+import Alert from "react-bootstrap/Alert";
 
 const BookVisit = () => {
     const [criteria, setCriteria] = useState({ service: "", employee: "" });
@@ -19,6 +20,10 @@ const BookVisit = () => {
     )
     const [slots, setSlots] = useState([]);
     const [pickedSlot, setPickedSlot] = useState(null);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [showMessage, setShowMessage] = useState(false);
+    const [showMessageSuccess, setShowMessageSuccess] = useState(false);
+    const [showClientForm, setShowClientForm] = useState(false);
 
     const updateSlots = (dateRange) => {
         axios.get(`http://localhost:8080/visits/slots?employeeId=${criteria.employee.id}&salonServiceId=${criteria.service.id}&startDate=${dateRange.start}&endDate=${dateRange.end}`)
@@ -70,6 +75,21 @@ const BookVisit = () => {
 
     }
 
+    const handleSetErrorMessage = (text) => {
+        setErrorMessage(text)
+        setShowMessage(true);
+    }
+
+    const handleSetMessageSuccess = () => {
+        setShowMessageSuccess(true);
+        updateSlots(dateRange);
+    }
+
+    const handleVisitSubmitted = () => {
+        setShowClientForm(false);
+        setPickedSlot(null);
+    }
+
     useEffect(() => {
         updateSlots(dateRange);
         const handleFocusOut = (event) => {
@@ -93,6 +113,8 @@ const BookVisit = () => {
     }, []);
 
     useEffect(() => {
+        setShowMessage(false);
+        setShowMessageSuccess(false);
         setSearchValidated('');
         getEmployeesForService();
         setCriteria({ ...criteria, employee: "" });
@@ -116,6 +138,8 @@ const BookVisit = () => {
                 startTime: start.toISOString().substring(11, 16),
                 endTime: end.toISOString().substring(11, 16),
             });
+        setShowMessage(false);
+        setShowMessageSuccess(false);
     }
 
 
@@ -129,7 +153,7 @@ const BookVisit = () => {
     }
 
     function displayClientForm() {
-        console.log("display sth");
+        setShowClientForm(true);
     }
 
 
@@ -179,6 +203,13 @@ const BookVisit = () => {
                     </Row>
                 }
             </Form>
+
+            <Alert show={showMessage} variant="danger">
+                Something went wrong! {errorMessage}
+            </Alert>
+            <Alert show={showMessageSuccess} variant="success">
+                Your visit has been booked!
+            </Alert>
             <FullCalendar
                 plugins={[timeGridPlugin]}
                 initialView='timeGridWeek'
@@ -203,11 +234,16 @@ const BookVisit = () => {
             <div className="centered-div">
                 <Button className="large-pink-button" variant="pink" disabled={pickedSlot == null} onClick={displayClientForm}>Book visit</Button>
             </div>
-            <RegistrationForm 
-                slot={pickedSlot}
-                service={criteria.service}
-                employee={criteria.employee}
-            />
+            {showClientForm &&
+                <RegistrationForm
+                    slot={pickedSlot}
+                    service={criteria.service}
+                    employee={criteria.employee}
+                    setSuccess={handleSetMessageSuccess}
+                    setError={handleSetErrorMessage}
+                    setEndForm={handleVisitSubmitted}
+                />
+            }
         </div>
     );
 }

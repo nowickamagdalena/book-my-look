@@ -4,8 +4,9 @@ import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
+import { useNavigate } from "react-router-dom";
 
-const RegistrationForm = ({ slot, service, employee }) => {
+const RegistrationForm = ({ slot, service, employee, setSuccess, setError, setEndForm }) => {
     const [clientData, setClientData] = useState({});
     const [formValidated, setFormValidated] = useState(false);
 
@@ -20,28 +21,24 @@ const RegistrationForm = ({ slot, service, employee }) => {
             event.preventDefault();
             event.stopPropagation();
             bookVisit();
+            setEndForm();
         }
         setFormValidated(true);
 
-    }
-
-    function handleCancel() {
-        console.log("handle cancel");
     }
 
     const bookVisit = () => {
         const visitData = { date: slot.day, startTime: slot.startTime, salonServiceId: service.id, employeeId:employee.id, client: clientData};
         axios.post(`http://localhost:8080/visits`, visitData)
                     .then(response => {
-                        console.log(response);
+                        setSuccess();
                     })
                     .catch(error => {
                         if (error.response) {
-                            // setErrorMessage(error.response.data.message);
+                            setError(error.response.data.message);
                         } else {
-                            // setErrorMessage(error.message);
+                            setError(error.response.data.message);
                         }
-                        // setShowMessage(true);
                         console.error('There was an error!');
                     });
     }
@@ -110,7 +107,7 @@ const RegistrationForm = ({ slot, service, employee }) => {
                         </Form.Group>
                         <div>
                         <Button className="m-3 float-end" variant="pink" type="submit" >Register</Button>
-                        <Button className="m-3 float-end" variant="danger" onClick={handleCancel}>Cancel</Button>
+                        <Button className="m-3 float-end" variant="danger" onClick={setEndForm}>Cancel</Button>
                         </div>
                     </Form>
                 </Col>
