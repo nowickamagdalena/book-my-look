@@ -3,11 +3,21 @@ import { useParams } from 'react-router-dom';
 import { Container, Row, Col, Image } from 'react-bootstrap';
 import axios from 'axios';
 import defaultImage from "../images/employee-default.jpg";
+import Disqus from "disqus-react"
 
 const EmployeeProfile = () => {
     const { id } = useParams();
     console.log('id: ', id);
     const [employee, setEmployee] = useState(null);
+
+    const disqusShortname = "bookmylook";
+    const [disqusConfig, setDisqusConfig] = useState({
+        url: `http://localhost:3000/employee-profile/${id}`,
+        identifier: `employee ${id}`,
+        title: `employee ${id}`
+    });
+
+    console.log('disqusConfig: ', disqusConfig)
 
     const fetchEmployee = async () => {
         try {
@@ -43,14 +53,21 @@ const EmployeeProfile = () => {
                             <p>Email: {employee.email}</p>
                             <h4>Available Services:</h4>
                             <ul>
-                                {employee.availableServices.map((service) => (
-                                    <li key={service}>{service.name}</li>
-                                ))}
+                                {employee.availableServices.map((service) => {
+                                    const key = `${service.id}-${employee.id}`;
+                                    return <li key={key}>{service.name}</li>;
+                                })}
                             </ul>
                         </>
                     )}
                 </Col>
             </Row>
+            <div className="disqus-container">
+                <Disqus.DiscussionEmbed
+                    shortname={disqusShortname}
+                    config={disqusConfig}
+                />
+            </div>
         </Container>
     );
 };

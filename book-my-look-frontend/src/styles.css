@@ -378,4 +378,8 @@ textarea {
     max-width: 200px;
 }
 
+.disqus-container {
+    margin-top: 100px;
+    width: 100%;
+}
 
