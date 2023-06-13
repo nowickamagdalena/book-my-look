@@ -144,3 +144,238 @@ fieldset input {
     flex-direction: row;
     justify-content: right;
 }
+
+.contact-page {
+    padding: 20px;
+}
+
+.color-container {
+    background-color: #dfb9d9;
+    box-shadow: 0 0 20px rgba(66, 68, 90, 0.5);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.contact-page .btn-pink {
+    margin-top: 20px;
+    float: right;
+    border-color: #c771b9;
+    font-size: 16px;
+    padding: 10px 30px;
+}
+
+.contact-page .btn-pink:hover {
+    background-color: #7d4875;
+    border-color: #7d4875;
+}
+
+.home {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+
+.hero {
+    margin: -60px -20px 80px;
+    position: relative;
+    z-index: 1;
+}
+
+.hero img {
+    width: 100%;
+    height: auto;
+    opacity: 0.6;
+}
+
+.hero-content {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    width: 100%;
+    transform: translate(-50%, -20%);
+    text-align: center;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 2px #9b4360;
+    animation: shining 2s ease-in-out infinite;
+}
+
+@keyframes shining {
+    0% {
+        text-shadow: 0 0 10px #9b4360;
+    }
+    50% {
+        text-shadow: 0 0 20px #9b4360;
+    }
+    100% {
+        text-shadow: 0 0 10px #9b4360;
+    }
+}
+
+.hero-content h2 {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.hero-content p {
+    font-size: 24px;
+}
+
+
+.services {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.services h2 {
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    justify-items: center;
+}
+
+.service {
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 4px;
+    text-align: center;
+    margin-bottom: 60px;
+    width: 100%;
+    box-shadow: 0 0 20px rgba(199, 113, 185, 0.5);
+    transition: transform 0.3s ease-in-out;
+}
+
+.service:hover {
+    transform: scale(1.05);
+}
+
+.service img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.service h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.service p {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.service .btn-pink {
+    background-color: #c771b9 !important;
+    color: white !important;
+    margin-right: 10px;
+    border-color: #c771b9;
+}
+
+.employee-card{
+    box-shadow: 0 0 20px rgba(199, 113, 185, 0.5);
+    transition: transform 0.3s ease-in-out;
+}
+
+.employee-card .image-container {
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.employee-card .image-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.employees-section {
+    margin-top: 40px;
+    text-align: center;
+    width: 60%;
+}
+
+.employees-section h2 {
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.employee-buttons .btn-pink {
+    background-color: #c771b9 !important;
+    color: white !important;
+    margin-right: 10px;
+    border-color: #c771b9;
+}
+
+.full-offer {
+    margin-top: 40px;
+    text-align: center;
+    width: 60%;
+}
+
+.full-offer h2 {
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.full-offer table {
+    width: 100%;
+}
+
+.full-offer th,
+.full-offer td {
+    padding: 10px;
+    text-align: left;
+}
+
+.full-offer th {
+    background-color: #c771b9;
+    color: white;
+    font-weight: bold;
+}
+
+.full-offer tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.full-offer tbody tr:hover {
+    background-color: #dfb9d9;
+}
+
+.profile-container {
+    margin-top: 40px;
+    padding: 20px;
+    width: 60%;
+}
+
+.profile-image {
+    object-fit: cover;
+    border-radius: 4px;
+    width: 70%;
+    max-width: 200px;
+}
+
+

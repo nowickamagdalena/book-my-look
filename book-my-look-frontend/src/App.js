@@ -11,13 +11,15 @@ import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import {  useState } from "react";
 
 import { AuthContext } from './context/AuthContext';
+import FullOffer from "./pages/FullOffer";
+import EmployeeProfile from "./pages/EmployeeProfile";
 // import useAuth from "./components/AuthContext";
 
 function App() {  
   
   const [currentUser, setCurrentUser] = useState();
 
-  const setAuth = (data) => {
+    const setAuth = (data) => {
     if(data) {
       localStorage.setItem("user", data);
         setCurrentUser({user: data});
@@ -38,7 +40,9 @@ function App() {
             <div className="content">
                 <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/out-team" element={<OurTeam />} />
+                    <Route path="/our-team" element={<OurTeam />} />
+                    <Route path="/employee-profile/:id" element={<EmployeeProfile />} />
+                    <Route path="/full-offer" element={<FullOffer />} />
                     <Route path="/book-visit" element={<BookVisit />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/employee-login" element={<EmployeeLogin />} />
