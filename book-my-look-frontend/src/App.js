@@ -40,7 +40,7 @@ function App() {
             <div className="content">
                 <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/out-team" element={<OurTeam />} />
+                    <Route path="/our-team" element={<OurTeam />} />
                     <Route path="/employee-profile" element={<EmployeeProfile />} />
                     <Route path="/full-offer" element={<FullOffer />} />
                     <Route path="/book-visit" element={<BookVisit />} />

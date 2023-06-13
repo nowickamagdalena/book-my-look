@@ -300,7 +300,7 @@ textarea {
 }
 
 .employee-card .image-container {
-    height: 250px;
+    height: 300px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -315,7 +315,7 @@ textarea {
 .employees-section {
     margin-top: 40px;
     text-align: center;
-    width: 50%;
+    width: 60%;
 }
 
 .employees-section h2 {
@@ -329,3 +329,40 @@ textarea {
     margin-right: 10px;
     border-color: #c771b9;
 }
+
+.full-offer {
+    margin-top: 40px;
+    text-align: center;
+    width: 60%;
+}
+
+.full-offer h2 {
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.full-offer table {
+    width: 100%;
+}
+
+.full-offer th,
+.full-offer td {
+    padding: 10px;
+    text-align: left;
+}
+
+.full-offer th {
+    background-color: #c771b9;
+    color: white;
+    font-weight: bold;
+}
+
+.full-offer tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.full-offer tbody tr:hover {
+    background-color: #dfb9d9;
+}
+
+
