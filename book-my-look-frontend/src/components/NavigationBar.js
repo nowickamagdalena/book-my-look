@@ -33,7 +33,8 @@ function NavigationBar() {
                     <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className="me-auto">
                             <Nav.Link href="/" style={{ color: 'white' }}>Home</Nav.Link>
-                            <Nav.Link href="/out-team" style={{ color: 'white' }}>Our team</Nav.Link>
+                            <Nav.Link href="/full-offer" style={{ color: 'white' }}>Full offer</Nav.Link>
+                            <Nav.Link href="/our-team" style={{ color: 'white' }}>Our team</Nav.Link>
                             <Nav.Link href="/book-visit" style={{ color: 'white' }}>Book visit</Nav.Link>
                             <Nav.Link href="/contact" style={{ color: 'white' }}>Contact</Nav.Link>
                         </Nav>
