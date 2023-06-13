@@ -5,10 +5,38 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from "react-router-dom";
+import emailjs from 'emailjs-com';
 
 const RegistrationForm = ({ slot, service, employee, setSuccess, setError, setEndForm }) => {
     const [clientData, setClientData] = useState({});
     const [formValidated, setFormValidated] = useState(false);
+
+    const sendEmail = async (clientData) => {
+        const templateParams = {
+            to_email: clientData.email,
+            reply_to: process.env.REACT_APP_ORG_EMAIL,
+            first_name: clientData.firstName,
+            last_name: clientData.lastName,
+            service_name: service.name,
+            employee_name: employee.firstName + ' ' + employee.lastName,
+            date: slot.day,
+            start_time: slot.startTime,
+            end_time: slot.endTime,
+            duration: service.duration + " min",
+        };
+
+        try {
+            await emailjs.send(
+                process.env.REACT_APP_SERVICE_ID,
+                process.env.REACT_APP_TEMPLATE_ID_CONFIRMATION,
+                templateParams,
+                process.env.REACT_APP_USER_ID
+            );
+            console.log('Email sent');
+        } catch (error) {
+            console.error('Error sending email:', error);
+        }
+    };
 
     const handleSubmit = (event) => {
 
@@ -32,6 +60,7 @@ const RegistrationForm = ({ slot, service, employee, setSuccess, setError, setEn
         axios.post(`http://localhost:8080/visits`, visitData)
                     .then(response => {
                         setSuccess();
+                        sendEmail(visitData.client).then(r => console.log(r));
                     })
                     .catch(error => {
                         if (error.response) {
