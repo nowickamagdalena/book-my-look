@@ -383,3 +383,31 @@ textarea {
     width: 100%;
 }
 
+.large-pink-button {
+    margin: 20px;
+    width: 200px !important;
+}
+
+.centered-div {
+    display: flex;
+    justify-content: center;
+}
+
+.registration-div {
+    margin-top: 40px;
+}
+.registration-div .col {
+    padding-top: 40px;
+}
+
+.visit-detail {
+    display: flex;
+    flex-direction: row;
+    max-width: 300px;
+}
+
+.detail-label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
