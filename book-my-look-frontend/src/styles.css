@@ -365,4 +365,17 @@ textarea {
     background-color: #dfb9d9;
 }
 
+.profile-container {
+    margin-top: 40px;
+    padding: 20px;
+    width: 60%;
+}
+
+.profile-image {
+    object-fit: cover;
+    border-radius: 4px;
+    width: 70%;
+    max-width: 200px;
+}
+
 

@@ -41,7 +41,7 @@ const OurTeam = () => {
                             <Link to="/book-visit">
                                 <button className="btn-pink">Book Visit</button>
                             </Link>
-                            <Link to="/employee-profile">
+                            <Link to={`/employee-profile/${member.id}`}>
                                 <button className="btn-pink">See Profile</button>
                             </Link>
                         </div>

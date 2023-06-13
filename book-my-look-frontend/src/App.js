@@ -19,7 +19,7 @@ function App() {
   
   const [currentUser, setCurrentUser] = useState();
 
-  const setAuth = (data) => {
+    const setAuth = (data) => {
     if(data) {
       localStorage.setItem("user", data);
         setCurrentUser({user: data});
@@ -41,7 +41,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/our-team" element={<OurTeam />} />
-                    <Route path="/employee-profile" element={<EmployeeProfile />} />
+                    <Route path="/employee-profile/:id" element={<EmployeeProfile />} />
                     <Route path="/full-offer" element={<FullOffer />} />
                     <Route path="/book-visit" element={<BookVisit />} />
                     <Route path="/contact" element={<Contact />} />
