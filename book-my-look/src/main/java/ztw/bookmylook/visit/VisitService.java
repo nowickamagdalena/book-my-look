@@ -121,7 +121,10 @@ public class VisitService {
 
         Client client = clientService.addClient(visit.getClient());
         Visit newVisit = new Visit(visit.getDate(), visit.getStartTime(), salonService, employee, client);
-
+        if(newVisit.getDate().isBefore(LocalDate.now()))
+        {
+            throw new IllegalArgumentException("Visit date cannot be in the past");
+        }
         visitRepository.saveAndFlush(newVisit);
 
         List<VisitPart> visitParts = divideVisitIntoParts(newVisit, salonService.getDuration());
@@ -149,6 +152,10 @@ public class VisitService {
         checkIfEmployeeHasSalonService(employee, visit.getSalonServiceId());
         checkIfEmployeeIsAvailable(employee, visit.getDate(), visit.getStartTime(), salonService);
 
+        if(visit.getDate().isBefore(LocalDate.now()))
+        {
+            throw new IllegalArgumentException("Visit date cannot be in the past");
+        }
         visitToUpdate.setDate(visit.getDate());
         visitToUpdate.setStartTime(visit.getStartTime());
         visitToUpdate.setSalonService(salonService);
