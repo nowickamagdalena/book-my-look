@@ -28,9 +28,16 @@ const BookVisit = () => {
     const updateSlots = (dateRange) => {
         axios.get(`http://localhost:8080/visits/slots?employeeId=${criteria.employee.id}&salonServiceId=${criteria.service.id}&startDate=${dateRange.start}&endDate=${dateRange.end}`)
             .then(res => {
-                const newSlots = res.data.map(slot => {
-                    return { title: criteria.service.name, start: `${slot.date}T${slot.startTime}`, end: `${slot.date}T${slot.endTime}` };
-                });
+                const dateNow = new Date();
+                console.log(dateNow);
+                const newSlots = res.data
+                    .filter(s => {
+                        // console.log(new Date(`${s.date}T${s.startTime}`).valueOf() >= new Date().valueOf());
+                        return new Date(`${s.date}T${s.startTime}`).valueOf() >= dateNow.valueOf();
+                    })
+                    .map(slot => {
+                        return { title: criteria.service.name, start: `${slot.date}T${slot.startTime}`, end: `${slot.date}T${slot.endTime}` };
+                    });
                 setSlots(newSlots);
             }).catch(error => {
                 console.error('There was an error!' + error);

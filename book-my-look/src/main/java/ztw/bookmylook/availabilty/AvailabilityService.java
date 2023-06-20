@@ -78,6 +78,9 @@ public class AvailabilityService {
         if (availability.getStartTime().getMinute() % 5 != 0 || availability.getEndTime().getMinute() % 5 != 0) {
             throw new IllegalArgumentException("Start and end time must be divisible by 5 minutes");
         }
+        if (availability.getDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Availability date cannot be in the past");
+        }
         availabilityRepository.findAllByEmployeeIdAndDate(availability.getEmployeeId(), availability.getDate()).forEach(
                 a -> {
                     if (hasConflictWithOtherAvailability(availability, a)) {
